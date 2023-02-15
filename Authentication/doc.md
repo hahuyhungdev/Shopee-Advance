@@ -67,3 +67,29 @@ Tất nhiên bạn cũng có thể gửi thông qua HTTP Header khác tùy bạn
 Cái chữ `Bearer` trước access token là để phân biệt giữa các Authentication schemes. Có một số Authentication schemes như: Basic, Bearer, Digest,... Tất nhiên là cũng có thể bạn bỏ đi cái `Bearer` này cũng được nếu server bạn không cần nó.
 
 Đấy, tóm lại là phụ thuộc vào ông server setup như thế nào thôi. Nhưng setup như trên là kiểu setup theo đại đa số dev, mà cái gì nhiều người làm thì mình cũng nên làm theo chứ đừng đánh đố nhau làm gì.
+
+### Cách thực hiện Token based authentication trên client
+
+Bước 1: trong interceptors request use can truyen vô header access token
+
+- get token từ đâu đó, trong demo này thì là bên localStorage.getItem("access_token")
+- nếu có access token gán vô config.headers.Authorization = `Bearer ${access_token}` và return về config
+  lúc này trong header mỗi lần request sẽ có access token trong header, nếu k có thì sẽ reject về lỗi
+  Bước 2: Trong interceptor response use nhận vô, nếu thành công thì return về config( có thể là config.data để lọc
+  bớt những thứ không cần thiết. Còn nếu bị lỗi thì bắt đầu set lại Refesh token )
+- check trạng thái , có các status cần chú ý, trong đấy thì 401 là err về Authorization và tùy theo server trả về lỗi gì để check
+  có thể đại loại như 'EXPIRED_ACCESS_TOKEN'
+- lúc này có 1 keyword để gọi lại hàm api vừa rồi được request lên là "Instance" và nhớ return nó, nếu không sẽ bị vòng lặp vô hạn
+- Gọi lại hàm refreshTOken( chỉ gọi được nếu nó đang trong trạng thái Promise nhé ) và có thể get được access_token bên trong nó
+- Tiến hành đẩy nó vô config.headers.Authorization gán với access_token đã lấy được ở trên và return về er.res.config
+- Nhưng vậy là chưa đủ, vd như 1 hàm có nhiều api và nếu vậy thì nó sẽ bị mutiple api do là mỗi hàm đều phải set lại với refreshToken,
+  để giải quyết vấn đề này thì ta nên khai báo từ constructor thêm this.refreshTokenRequest = null và check nó. Nếu this.refreshTokenRequest tổn tại thì gán chính nó,
+  còn không thì bằng refreshToken(). Lưu ý thì do nó trả về promise nên lúc return lại this.refreshTokenRequest ta vẫn có thể then và xử lí nó
+- Khi bước trên đã thành công. Sẽ gặp case là cứ resolved do đã tồn tại this.refreshTokenRequest rồi, mà nó lại set cái access_token cũ vô nên bị infinite loop ( vòng lặp vô hạn)
+  cách giải quyết ở đây là ta phải set lại giá trị this.refreshTokenRequest null khi mà phiên refresh_token của ta đã hoàn thành lúc gán, sử dụng finally
+  <br>
+
+  > Cơ mà nếu hàm xử lí refresh token bị lỗi thì sao nhở ?
+
+  vì nó đang promise xử lí async nên ta có thể xử lí trong catch bằng việc clear nó đi và throw nó đi qua err.response để nó
+  không nhảy qua promise relsovel nữa mà nhảy qua promise reject. lúc này trong interceptor ta cần thêm catch trong lúc return this.refreshTokenRequest
