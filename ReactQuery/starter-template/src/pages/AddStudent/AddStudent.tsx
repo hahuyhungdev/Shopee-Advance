@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { addStudent, getStudent, updateStudent } from 'api/students.api'
 import { isEqual } from 'lodash'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMatch, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { Student } from 'types/common'
@@ -41,11 +41,21 @@ export default function AddStudent() {
     queryKey: ['student', id],
     queryFn: () => getStudent(id as string),
     enabled: id !== undefined || !isAddMode,
-    onSuccess: (data) => {
-      console.log('dataget', data.data)
-      setFormState(data.data)
-    }
+    // nó sẽ lấy data từ cache nếu có, nếu không có thì mới gọi api sau 10s
+    staleTime: 10 * 1000
+    // cũng chính là staleTime, nếu data trong cache quá 10s thì mới gọi api. Nên nó không chạy
+    // queryFn nếu data trong cache vẫn còn đâu, lấy gì mà gọi api getSudent nữa, nên đoạn "onSuccess" không chạy
+    // Nên đoạn này có thể sử dụng useEffect để lấy data từ cache và setFormState
+    // onSuccess: (data) => {
+    //   console.log('dataget', data.data)
+    //   setFormState(data.data)
+    // }
   })
+  useEffect(() => {
+    if (studentsQuery.data) {
+      setFormState(studentsQuery.data.data)
+    }
+  }, [studentsQuery.data])
 
   // update student
   const updateStudentMutation = useMutation({

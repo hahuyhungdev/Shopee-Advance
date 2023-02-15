@@ -32,7 +32,7 @@ export default function Students() {
     deleteStudentMutation.mutate(id)
   }
 
-  // trong useQuery có options là onSuccess, nếu muốn dùng thì thay vì dùng useEffect thì dùng onSuccess
+  // trong useQuery có options là onSuccess, nếu muốn dùng thì thay vì dùng useEffect thì dùng onSuccess (tùy case)
   // useEffect(() => {
   //   if (dataStudents) {
   //     setStudents(dataStudents.data)
@@ -41,10 +41,12 @@ export default function Students() {
   const totalStudentsCount = Number(studentsQuery.data?.headers['x-total-count'] || 0)
   const totalPage = Math.ceil(totalStudentsCount / LIMIT)
 
-  // handle prefetcg student when hover on show info
+  // handle prefetch student when hover on show info student (howerver on save cache with staleTime and use Effect to get data with useState)
   const handlePrefetch = (id: number) => {
     queryClient.prefetchQuery(['student', String(id)], {
-      queryFn: () => getStudent(id)
+      queryFn: () => getStudent(id),
+      // used for cache data
+      staleTime: 10 * 1000 // 10s
     })
   }
 
