@@ -1,11 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
-import { addStudent } from 'api/students.api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { addStudent, getStudent, updateStudent } from 'api/students.api'
+import { isEqual } from 'lodash'
 import { useMemo, useState } from 'react'
-import { useMatch } from 'react-router-dom'
+import { useMatch, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { Student } from 'types/common'
 import { isAxiosError } from 'utils/utils'
 
-type FormStateType = Omit<Student, 'id'>
+type FormStateType = Omit<Student, 'id'> | Student
 const initialFormState: FormStateType = {
   avatar: '',
   email: '',
@@ -25,46 +27,70 @@ export default function AddStudent() {
 
   const addMatch = useMatch('/students/add')
   const isAddMode = Boolean(addMatch)
-  const { mutate, error, reset, mutateAsync } = useMutation({
+
+  const queryClient = useQueryClient()
+  // func add student mutation
+  const addStudentMutation = useMutation({
     mutationFn: (body: FormStateType) => {
       return addStudent(body)
     }
   })
-  console.log('error', error)
+
+  const { id } = useParams<{ id: string }>()
+  const studentsQuery = useQuery({
+    queryKey: ['student', id],
+    queryFn: () => getStudent(id as string),
+    enabled: id !== undefined || !isAddMode,
+    onSuccess: (data) => {
+      console.log('dataget', data.data)
+      setFormState(data.data)
+    }
+  })
+
+  // update student
+  const updateStudentMutation = useMutation({
+    mutationFn: (_) => updateStudent(id as string, formState as Student),
+    onSuccess: () => {
+      // i used test with queryClient.invalidateQueries and i see it just work with useMutation, but not work with mutate
+      queryClient.invalidateQueries(['student', id])
+    }
+  })
+
   const errorForm: FormError = useMemo(() => {
+    const error = isAddMode ? addStudentMutation.error : updateStudentMutation.error
     if (
       isAxiosError<{
         error: FormError
       }>(error) &&
-      error?.response?.status === 422
+      error.response?.status === 422
     ) {
-      return error?.response?.data?.error
+      return error.response?.data?.error
     }
     return null
-  }, [error])
+  }, [addStudentMutation, updateStudentMutation, isAddMode])
+  if (studentsQuery.isLoading && !isAddMode) {
+    return <div>Loading...</div>
+  }
+  if (!studentsQuery.data && !isAddMode) {
+    return <div>Student not found</div>
+  }
 
   // Dùng currying
   const handleChange = (key: keyof FormStateType) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormState((prev) => ({ ...prev, [key]: e.target.value }))
     console.log('errorForm', errorForm)
     if (errorForm) {
-      reset()
+      addStudentMutation.reset()
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // if (!/@/.test(formState.email)) {
-    //   alert('Invalid email')
-    //   return
-    // }
-    console.log(formState)
     // mutate(formState)
     // setFormState(initialFormState)
     // với case ở trên thì khi submit form thì sẽ reset lại formState, nhưng
     // có 1 vấn đề lớn là nếu server bị delay thì trước khi submit xong thì formState đã bị reset
     // và cái mutate nó là async chứ không phải promise nên nó sẽ không chờ mutate xong mới reset. có 2 cách
-
     // CÁCH 1: dùng đối số thứ 2 của mutate để reset formState
     // mutate(formState, {
     //   onSuccess: () => {
@@ -72,11 +98,33 @@ export default function AddStudent() {
     //   }
     // })
     // CÁCH 2: dùng reset của useMutation
-    try {
-      await mutateAsync(formState)
-      setFormState(initialFormState)
-    } catch (error) {
-      console.log('error', error)
+    // try {
+    //   await mutateAsync(formState)
+    //   setFormState(initialFormState)
+    // } catch (error) {
+    //   console.log('error', error)
+    // }
+    if (isAddMode) {
+      addStudentMutation.mutate(formState, {
+        onSuccess: (data) => {
+          toast.success('Add student successfully')
+          console.log('data', data)
+          setFormState(initialFormState)
+        }
+      })
+      return
+    } else {
+      if (isEqual(formState, studentsQuery.data?.data)) {
+        toast.error('Nothing change')
+        return
+      }
+      updateStudentMutation.mutate(undefined, {
+        onSuccess: (data) => {
+          toast.success('Update student successfully')
+          console.log('data', data.data)
+          // setFormState(data.data)
+        }
+      })
     }
   }
 
@@ -116,8 +164,8 @@ export default function AddStudent() {
                 <input
                   id='gender-1'
                   type='radio'
-                  value='male'
-                  checked={formState.gender === 'male'}
+                  value='Male'
+                  checked={formState.gender === 'Male'}
                   onChange={handleChange('gender')}
                   name='gender'
                   className='h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
@@ -130,8 +178,8 @@ export default function AddStudent() {
                 <input
                   id='gender-2'
                   type='radio'
-                  value='female'
-                  checked={formState.gender === 'female'}
+                  value='Female'
+                  checked={formState.gender === 'Female'}
                   onChange={handleChange('gender')}
                   name='gender'
                   className='h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600'
@@ -256,7 +304,7 @@ export default function AddStudent() {
           type='submit'
           className='w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 sm:w-auto'
         >
-          Submit
+          {isAddMode ? 'Add' : 'Update'}
         </button>
       </form>
     </div>

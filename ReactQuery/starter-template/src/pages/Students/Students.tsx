@@ -1,27 +1,53 @@
-import { useQuery } from '@tanstack/react-query'
-import { getStudents } from 'api/students.api'
-import { useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { deleteStudent, getStudent, getStudents } from 'api/students.api'
 import { Link } from 'react-router-dom'
-import { StudentList } from 'types/common'
+import { toast } from 'react-toastify'
+import { Student } from 'types/common'
 import { useQueryString } from 'utils/utils'
 const LIMIT = 10
 export default function Students() {
-  const [students, setStudents] = useState<StudentList>([])
   const queryString = useQueryString()
   const page = Number(queryString.page) || 1
-  const { data: dataStudents, isLoading } = useQuery({
+  const studentsQuery = useQuery({
     queryKey: ['students', page],
     queryFn: () => getStudents(page, LIMIT),
     //save data in cache and better for ux pagination
     keepPreviousData: true
   })
-  useEffect(() => {
-    if (dataStudents) {
-      setStudents(dataStudents.data)
+
+  const queryClient = useQueryClient()
+
+  // delete student mutation
+  const deleteStudentMutation = useMutation({
+    mutationFn: (id: number) => deleteStudent(id),
+    onSuccess: (_, id) => {
+      // refetch data
+      // exact: true để xác định queryKey cụ thể
+      queryClient.invalidateQueries({ queryKey: ['students', page], exact: true })
+      toast.success(`Delete student ${id} successfully`)
     }
-  }, [dataStudents])
-  const totalStudentsCount = Number(dataStudents?.headers['x-total-count'] || 0)
+  })
+
+  const handleDeleteStudent = (id: number) => {
+    deleteStudentMutation.mutate(id)
+  }
+
+  // trong useQuery có options là onSuccess, nếu muốn dùng thì thay vì dùng useEffect thì dùng onSuccess
+  // useEffect(() => {
+  //   if (dataStudents) {
+  //     setStudents(dataStudents.data)
+  //   }
+  // }, [dataStudents])
+  const totalStudentsCount = Number(studentsQuery.data?.headers['x-total-count'] || 0)
   const totalPage = Math.ceil(totalStudentsCount / LIMIT)
+
+  // handle prefetcg student when hover on show info
+  const handlePrefetch = (id: number) => {
+    queryClient.prefetchQuery(['student', String(id)], {
+      queryFn: () => getStudent(id)
+    })
+  }
+
   return (
     <div>
       <h1 className='text-lg'>Students</h1>
@@ -34,7 +60,7 @@ export default function Students() {
         </Link>
       </div>
 
-      {isLoading ? (
+      {studentsQuery.isLoading ? (
         <div>
           <div role='status' className='mt-6 animate-pulse'>
             <div className='mb-4 h-4  rounded bg-gray-200 dark:bg-gray-700' />
@@ -76,10 +102,11 @@ export default function Students() {
               </tr>
             </thead>
             <tbody>
-              {students.map((student) => (
+              {studentsQuery.data?.data.map((student) => (
                 <tr
                   key={student.id}
                   className='border-b bg-white hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-600'
+                  onMouseEnter={() => handlePrefetch(student.id)}
                 >
                   <td className='py-4 px-6'>{student.id}</td>
                   <td className='py-4 px-6'>
@@ -91,12 +118,17 @@ export default function Students() {
                   <td className='py-4 px-6'> {student.email}</td>
                   <td className='py-4 px-6 text-right'>
                     <Link
-                      to='/students/1'
+                      to={`/students/${student.id}`}
                       className='mr-5 font-medium text-blue-600 hover:underline dark:text-blue-500'
                     >
                       Edit
                     </Link>
-                    <button className='font-medium text-red-600 dark:text-red-500'>Delete</button>
+                    <button
+                      onClick={() => handleDeleteStudent(student.id)}
+                      className='font-medium text-red-600 dark:text-red-500'
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
