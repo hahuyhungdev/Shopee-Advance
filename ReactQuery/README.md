@@ -37,7 +37,7 @@ React Query có cơ chế caching hơi khác một chút so với RTK Query, nê
 - `inactive`: là khi data đó không còn component nào subcribe cả
 
 ```tsx
-const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodoList })
+const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodoList });
 ```
 
 `result` là một object chứa một vài state rất quan trọng: `status`, `fetchStatus`,...
@@ -88,13 +88,13 @@ Giả sử chúng ta dùng `cacheTime` mặc định là **5 phút** và `staleT
 
 ```jsx
 function A() {
-  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos });
 }
 function B() {
-  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos });
 }
 function C() {
-  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+  const result = useQuery({ queryKey: ['todos'], queryFn: fetchTodos });
 }
 ```
 
