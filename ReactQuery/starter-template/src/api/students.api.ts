@@ -1,12 +1,13 @@
 import { Student, StudentList } from 'types/common'
 import http from 'utils/http'
 
-export const getStudents = (page: number | string = 1, limit: number | string = 10) => {
+export const getStudents = (page: number | string = 1, limit: number | string = 10, signal?: AbortSignal) => {
   return http.get<StudentList>('students', {
     params: {
       _page: page,
       _limit: limit
-    }
+    },
+    signal
   })
 }
 // get one student

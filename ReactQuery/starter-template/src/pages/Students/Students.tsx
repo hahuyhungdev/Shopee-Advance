@@ -10,7 +10,19 @@ export default function Students() {
   const page = Number(queryString.page) || 1
   const studentsQuery = useQuery({
     queryKey: ['students', page],
-    queryFn: () => getStudents(page, LIMIT),
+    // query signal for cancel request manual
+    // queryFn: ({ signal }) => getStudents(page, LIMIT, signal),
+    // query signal for cancel request automation
+    // however retry 3 times when request fail
+    queryFn: () => {
+      const controller = new AbortController()
+      setTimeout(() => {
+        controller.abort()
+      }, 3000)
+      return getStudents(page, LIMIT, controller.signal)
+    },
+    // default is 3 times when request fail. feature of tanstack/react-query
+    retry: 1,
     //save data in cache and better for ux pagination
     keepPreviousData: true
   })
@@ -43,16 +55,48 @@ export default function Students() {
 
   // handle prefetch student when hover on show info student (howerver on save cache with staleTime and use Effect to get data with useState)
   const handlePrefetch = (id: number) => {
-    queryClient.prefetchQuery(['student', String(id)], {
+    // queryClient.prefetchQuery(['student', String(id)], {
+    //   queryFn: () => getStudent(id),
+    //   // used for cache data
+    //   staleTime: 10 * 1000 // 10s
+    // })
+  }
+
+  const fetchStudent = (second: number) => {
+    const id = '6'
+    queryClient.prefetchQuery(['student', id], {
       queryFn: () => getStudent(id),
-      // used for cache data
-      staleTime: 10 * 1000 // 10s
+      staleTime: second * 1000 // 10s
     })
+  }
+
+  const refetchStudents = () => {
+    studentsQuery.refetch()
+  }
+
+  // cancel request manual with queryClient.cancelQueries
+  const cancelRequest = () => {
+    queryClient.cancelQueries({ queryKey: ['students', page] })
+    // although cancel request, howerver axios still send request to server with status 200
+    // should handle in server, us can use axios cancel with queryFn and pass signal to axios
+    // at api student.api.ts . i wil add parameter signal and when call api, i will pass argument signal
   }
 
   return (
     <div>
       <h1 className='text-lg'>Students</h1>
+      <button className='mt-6 rounded bg-blue-500 px-5 py-2' onClick={() => fetchStudent(5)}>
+        click 10s
+      </button>
+      <button className='mt-6 rounded bg-blue-500 px-5 py-2' onClick={() => fetchStudent(3)}>
+        click 2s
+      </button>
+      <button onClick={() => refetchStudents()} className='mt-6 rounded bg-pink-700 px-5 py-2'>
+        refetch students
+      </button>
+      <button onClick={() => cancelRequest()} className='mt-6 rounded bg-pink-700 px-5 py-2'>
+        Cancel request students
+      </button>
       <div className='mt-6'>
         <Link
           to='/students/add'
