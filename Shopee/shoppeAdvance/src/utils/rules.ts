@@ -1,5 +1,5 @@
 import type { RegisterOptions, UseFormGetValues } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+
 import * as yup from 'yup'
 
 type Rules = {
@@ -8,7 +8,6 @@ type Rules = {
 // because if not use ts, us don't know what is the type of rules and very danger to use it.
 // it's the reason why we use typescript with options fields of react-hook-form
 //  we use react-hook-form, we can use the same rules as react-hook-form
-
 export const getRulse = (
   getValues: UseFormGetValues<{
     email: string
@@ -85,7 +84,13 @@ export const schema = yup.object({
     .max(20, 'Password must have at most 20 characters'),
   confirm_password: yup
     .string()
-    .required('Password does not exist')
+    .required('Must have confirm password')
     .min(6, 'Password must have at least 6 characters')
     .max(20, 'Password must have at most 20 characters')
+    .oneOf([yup.ref('password')], 'Passwords must match')
 })
+export type ISchema = yup.InferType<typeof schema>
+// example if want to use yup with schema fields
+const loginSchema = schema.omit(['confirm_password'])
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type ILoginSchema = yup.InferType<typeof loginSchema>
