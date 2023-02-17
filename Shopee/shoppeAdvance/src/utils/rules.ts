@@ -79,9 +79,14 @@ export const schema = yup.object({
     .max(160, 'Email must have at most 160 characters'),
   password: yup
     .string()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    )
     .required('Password does not exist')
     .min(6, 'Password must have at least 6 characters')
     .max(20, 'Password must have at most 20 characters'),
+
   confirm_password: yup
     .string()
     .required('Must have confirm password')
@@ -91,6 +96,6 @@ export const schema = yup.object({
 })
 export type ISchema = yup.InferType<typeof schema>
 // example if want to use yup with schema fields
-const loginSchema = schema.omit(['confirm_password'])
+export const loginSchema = schema.omit(['confirm_password'])
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type ILoginSchema = yup.InferType<typeof loginSchema>
+export type ILoginSchema = yup.InferType<typeof loginSchema>

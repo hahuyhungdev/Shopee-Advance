@@ -1,37 +1,53 @@
+import { yupResolver } from '@hookform/resolvers/yup'
 import React from 'react'
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import Input from 'src/components/Input'
+import { ILoginSchema, loginSchema } from 'src/utils/rules'
 
 export default function Login() {
+  const {
+    handleSubmit,
+    register,
+    getValues,
+    formState: { errors }
+  } = useForm<ILoginSchema>({
+    resolver: yupResolver(loginSchema)
+  })
+
   // handle submit
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('submit')
-  }
+  const onSubmit = handleSubmit(
+    (data) => {
+      console.log('data', data)
+    },
+    (error) => {
+      console.log('error', error)
+    }
+  )
 
   return (
     <div className='bg-orange'>
       <div className='container'>
         <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
           <div className='md:col-span-2 md:col-start-4'>
-            <form className='rounded bg-white p-10 shadow-sm' onSubmit={handleSubmit}>
+            <form className='rounded bg-white p-10 shadow-sm' onSubmit={onSubmit}>
               <div className='text-2xl'>Login</div>
-              <div className='mt-8'>
-                <input
-                  type='email'
-                  className='w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm'
-                  placeholder='email'
-                />
-                <div className='mt-1 min-h-[1rem] text-sm text-red-600'></div>
-              </div>
-              <div className='mt-3'>
-                <input
-                  autoComplete='on'
-                  type='password'
-                  className='w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm'
-                  placeholder='password'
-                />
-                <div className='mt-1 min-h-[1rem] text-sm text-red-600'></div>
-              </div>
+              <Input
+                className='mt-6'
+                type='email'
+                placeholder='Email'
+                name='email'
+                register={register}
+                errorMessage={errors.email?.message}
+              />
+              <Input
+                className='my-2'
+                type='password'
+                placeholder='password'
+                name='password'
+                register={register}
+                errorMessage={errors.password?.message}
+              />
               <button className='w-full bg-red-500 py-4 px-2 text-center text-sm uppercase text-white hover:bg-red-600'>
                 Login
               </button>
