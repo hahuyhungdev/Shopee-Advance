@@ -1,4 +1,7 @@
 import type { RegisterOptions, UseFormGetValues } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+
 type Rules = {
   [key in 'email' | 'password' | 'confirm_password']?: RegisterOptions
 }
@@ -66,4 +69,23 @@ export const getRulse = (
       }
     }
   }
+})
+
+export const schema = yup.object({
+  email: yup
+    .string()
+    .required('Email does not exist')
+    .email('Email does not correct format')
+    .min(5, 'Email must have at least 5 characters')
+    .max(160, 'Email must have at most 160 characters'),
+  password: yup
+    .string()
+    .required('Password does not exist')
+    .min(6, 'Password must have at least 6 characters')
+    .max(20, 'Password must have at most 20 characters'),
+  confirm_password: yup
+    .string()
+    .required('Password does not exist')
+    .min(6, 'Password must have at least 6 characters')
+    .max(20, 'Password must have at most 20 characters')
 })
