@@ -1,33 +1,61 @@
-import React from 'react'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { registerAccount } from 'src/apis/auth.api'
 import Input from 'src/components/Input'
+import { omit } from 'lodash'
 import { ISchema, schema } from 'src/utils/rules'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
+import { ResponseAPI } from 'src/types/utils.type'
 
 export default function Register() {
   const {
     handleSubmit,
     register,
-    getValues,
+    setError,
     formState: { errors }
   } = useForm<ISchema>({
     resolver: yupResolver(schema)
   })
-
-  // const rules = getRulse(getValues)
-
-  // handle submit
-  const onSubmit = handleSubmit(
-    (data) => {
-      console.log('data', data)
-    },
-    (error) => {
-      console.log('error', error)
-      const password = getValues('password')
-      console.log('password', password)
+  // registerMutations
+  const registerAccountMutation = useMutation({
+    mutationFn: (body: Omit<ISchema, 'confirm_password'>) => {
+      return registerAccount(body)
     }
-  )
+  })
+  // handle submit
+  const onSubmit = handleSubmit((data) => {
+    const body = omit(data, ['confirm_password'])
+    registerAccountMutation.mutate(body, {
+      onSuccess: (data) => {
+        console.log('dateMutation', data)
+      },
+      onError: (error) => {
+        if (isAxiosUnprocessableEntityError<ResponseAPI<Omit<ISchema, 'confirm_password'>>>(error)) {
+          const formError = error.response?.data?.data
+          // case 1
+          // if (formError?.email) {
+          //   // after setError, the error will be show in the input of error response from server
+          //   setError('email', {
+          //     type: 'Server',
+          //     message: formError.email
+          //   })
+          // }
+
+          // but in case have many error, we can use Object.keys to loop all error
+          if (formError) {
+            Object.keys(formError).forEach((key) => {
+              setError(key as keyof Omit<ISchema, 'confirm_password'>, {
+                type: 'Server',
+                message: formError[key as keyof Omit<ISchema, 'confirm_password'>]
+              })
+            })
+          }
+        }
+      }
+    })
+  })
   return (
     <div className='bg-orange'>
       <div className='container'>
@@ -45,7 +73,7 @@ export default function Register() {
               />
               <Input
                 className='mt-2'
-                type='password'
+                type='text'
                 placeholder='password'
                 name='password'
                 register={register}
