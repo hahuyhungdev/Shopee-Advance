@@ -26,10 +26,10 @@ export default function Login() {
   )
 
   return (
-    <div className='bg-orange'>
-      <div className='container'>
+    <div className='h-[600px] bg-orange'>
+      <div className='container bg-shopee bg-contain bg-center bg-no-repeat'>
         <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
-          <div className='md:col-span-2 md:col-start-4'>
+          <div className='md:col-span-2 md:col-start-4 md:mx-8'>
             <form className='rounded bg-white p-10 shadow-sm' onSubmit={onSubmit}>
               <div className='text-2xl'>Login</div>
               <Input
