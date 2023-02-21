@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { registerAccount } from 'src/apis/auth.api'
 import Input from 'src/components/Input'
 import { omit } from 'lodash'
@@ -18,6 +18,7 @@ export default function Register() {
   } = useForm<ISchema>({
     resolver: yupResolver(schema)
   })
+  const navigate = useNavigate()
   // registerMutations
   const registerAccountMutation = useMutation({
     mutationFn: (body: Omit<ISchema, 'confirm_password'>) => {
@@ -30,6 +31,10 @@ export default function Register() {
     registerAccountMutation.mutate(body, {
       onSuccess: (data) => {
         console.log('dateMutation', data)
+        alert('Register success, you will be redirect to login page')
+        setTimeout(() => {
+          navigate('/login')
+        }, 3000)
       },
       onError: (error) => {
         if (isAxiosUnprocessableEntityError<ResponseAPI<Omit<ISchema, 'confirm_password'>>>(error)) {
