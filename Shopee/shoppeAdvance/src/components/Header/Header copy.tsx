@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import Popover from '../Popover'
 
 export default function Header() {
   return (
@@ -28,18 +27,48 @@ export default function Header() {
             </div>
           </div>
           <div className='flex justify-end'>
-            <Popover
-              as={'span'}
+            <div
               className='flex cursor-pointer items-center py-1 hover:text-gray-300'
-              renderPopover={
-                <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
-                  <div className='flex flex-col py-2 pl-3 pr-28'>
-                    <button className='py-2 px-3 text-left hover:text-orange'>Vietnamese</button>
-                    <button className='py-2 px-3 text-left hover:text-orange'>English</button>
-                  </div>
-                </div>
-              }
+              ref={reference}
+              onMouseEnter={showPopover}
+              onMouseLeave={hidePopover}
             >
+              <FloatingPortal>
+                <AnimatePresence>
+                  {open && (
+                    <motion.div
+                      initial={{ opacity: 0, transform: 'scale(0)' }}
+                      animate={{ opacity: 1, transform: 'scale(1)' }}
+                      exit={{ opacity: 0, transform: 'scale(0)' }}
+                      transition={{ duration: 0.2 }}
+                      ref={floating}
+                      style={{
+                        position: strategy,
+                        top: y ?? 0,
+                        left: x ?? 0,
+                        width: 'max-content',
+                        transformOrigin: `${middlewareData.arrow?.x}px} top`
+                      }}
+                    >
+                      <span
+                        className='absolute z-10 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent border-b-white'
+                        ref={arrowRef}
+                        style={{
+                          left: middlewareData.arrow?.x,
+                          top: middlewareData.arrow?.y
+                        }}
+                      />
+
+                      <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
+                        <div className='flex flex-col py-2 px-3'>
+                          <button className='py-2 px-3 hover:text-orange'>Vietnamese</button>
+                          <button className='py-2 px-3 hover:text-orange'>English</button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </FloatingPortal>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
                 fill='none'
@@ -65,21 +94,9 @@ export default function Header() {
               >
                 <path strokeLinecap='round' strokeLinejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' />
               </svg>
-            </Popover>
-            <Popover
-              className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'
-              renderPopover={
-                <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
-                  <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
-                    My Account
-                  </Link>
-                  <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
-                    My Purchase
-                  </Link>
-                  <button className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>Logout</button>
-                </div>
-              }
-            >
+            </div>
+
+            <div className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'>
               <div className='mr-2 h-5 w-5 flex-shrink-0'>
                 <img
                   src='https://cf.shopee.vn/file/3338b44837eeaa51d47863a1bf236286_tn'
@@ -88,7 +105,7 @@ export default function Header() {
                 />
               </div>
               <p>Ha Huy Hung</p>
-            </Popover>
+            </div>
           </div>
         </div>
         <div className='mt-4 grid grid-cols-12 items-end gap-4'>

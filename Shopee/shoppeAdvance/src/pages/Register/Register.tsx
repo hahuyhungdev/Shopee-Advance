@@ -62,10 +62,10 @@ export default function Register() {
     })
   })
   return (
-    <div className='bg-orange'>
-      <div className='container'>
-        <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
-          <div className='md:col-span-2 md:col-start-4'>
+    <div className='h-[600px] bg-orange'>
+      <div className='container bg-shopee bg-contain bg-center bg-no-repeat'>
+        <div className='grid grid-cols-1 py-12 lg:h-[470px] lg:grid-cols-5 lg:pr-10'>
+          <div className='md:col-span-2 md:col-start-4 md:mx-8'>
             <form className='rounded bg-white p-10 shadow-sm' onSubmit={onSubmit} noValidate>
               <div className='text-2xl'>Register</div>
               <Input
