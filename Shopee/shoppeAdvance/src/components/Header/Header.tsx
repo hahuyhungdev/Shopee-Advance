@@ -1,7 +1,61 @@
+import { useMutation } from '@tanstack/react-query'
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { logoutAccount } from 'src/apis/auth.api'
+import { AppContext } from 'src/contexts/app.context'
 import Popover from '../Popover'
 
+interface ProductCartProps {
+  name: string
+  price: number
+  image: string
+  quantity: number
+}
+const initialProductCart: ProductCartProps[] = [
+  {
+    name: 'Túi Chống Sốc Laptop 13 inch 14 inch 15 inch HARAS TCP001 inch 15 inch HARAS TCP001',
+    price: 100,
+    image: 'https://cf.shopee.vn/file/sg-11134201-22100-fx3iht2sz0ivcc_tn',
+    quantity: 1
+  },
+  {
+    name: 'Áo sweater dày dặn AMBUSII, áo nỉ bông nam nữ',
+    price: 200,
+    image: 'https://cf.shopee.vn/file/sg-11134201-23020-7sxd4inr23mv49_tn',
+    quantity: 1
+  },
+  {
+    name: 'Áo sơ mi nam cổ tròn, áo sơ mi nam cổ tròn',
+    price: 300,
+    image: 'https://picsum.photos/200/300',
+    quantity: 1
+  },
+  {
+    name: 'Macbook Pro 2020 13 inch M1 8GB 256GB',
+    price: 400,
+    image: 'https://cf.shopee.vn/file/3dc295d6cf179db2dab61359a6969e8b_tn',
+    quantity: 1
+  }
+]
+
 export default function Header() {
+  const { setIsAuthenticated, isAuthenticated } = useContext(AppContext)
+  const logoutMutation = useMutation({
+    mutationFn: () => {
+      return logoutAccount()
+    },
+    onSuccess: () => {
+      setIsAuthenticated(false)
+      toast.success('Logout success')
+    }
+  })
+
+  // handle logout mutate
+  const handleLogout = () => {
+    logoutMutation.mutate()
+  }
+
   return (
     <div className='transition-[transform .2s cubic-bezier(.4,0,.2,1)] bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
       <div className='container'>
@@ -66,29 +120,47 @@ export default function Header() {
                 <path strokeLinecap='round' strokeLinejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' />
               </svg>
             </Popover>
-            <Popover
-              className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'
-              renderPopover={
-                <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
-                  <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
-                    My Account
-                  </Link>
-                  <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
-                    My Purchase
-                  </Link>
-                  <button className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>Logout</button>
+            {isAuthenticated && (
+              <Popover
+                className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'
+                renderPopover={
+                  <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
+                    <Link to='/profile' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
+                      My Account
+                    </Link>
+                    <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
+                      My Purchase
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'
+                    >
+                      Logout
+                    </button>
+                  </div>
+                }
+              >
+                <div className='mr-2 h-5 w-5 flex-shrink-0'>
+                  <img
+                    src='https://cf.shopee.vn/file/3338b44837eeaa51d47863a1bf236286_tn'
+                    alt='avatar'
+                    className='h-full w-full rounded-full object-cover'
+                  />
                 </div>
-              }
-            >
-              <div className='mr-2 h-5 w-5 flex-shrink-0'>
-                <img
-                  src='https://cf.shopee.vn/file/3338b44837eeaa51d47863a1bf236286_tn'
-                  alt='avatar'
-                  className='h-full w-full rounded-full object-cover'
-                />
+                <p>Ha Huy Hung</p>
+              </Popover>
+            )}
+            {!isAuthenticated && (
+              <div className='flex items-center'>
+                <Link to='/register' className='mx-3 capitalize hover:text-white/70'>
+                  Register
+                </Link>
+                <div className='h-4 border-r-[1px] border-white/40' />
+                <Link to='/login' className='mx-3 capitalize hover:text-white/70'>
+                  Login
+                </Link>
               </div>
-              <p>Ha Huy Hung</p>
-            </Popover>
+            )}
           </div>
         </div>
         <div className='mt-4 grid grid-cols-12 items-end gap-4'>
@@ -100,12 +172,12 @@ export default function Header() {
             </svg>
           </Link>
           <form className='col-span-9'>
-            <div className='flex rounded-none bg-white p-1'>
+            <div className='flex h-[40px] rounded-none bg-white p-1'>
               <input
                 placeholder='Free Shipping on Orders Over $50'
                 type='text'
                 name='search'
-                className='flex-grow border-none bg-transparent px-3 py-2 text-black outline-none'
+                className='h-[34px] flex-grow border-none bg-transparent text-black outline-none'
               />
               <button className='flex-shrink-0 rounded-sm bg-orange py-2 px-6 hover:opacity-90'>
                 <svg
@@ -114,7 +186,7 @@ export default function Header() {
                   viewBox='0 0 24 24'
                   strokeWidth='1.5'
                   stroke='currentColor'
-                  className='h-6 w-6'
+                  className='h-4 w-4'
                 >
                   <path
                     strokeLinecap='round'
@@ -125,23 +197,63 @@ export default function Header() {
               </button>
             </div>
           </form>
-          <div className='col-span-1'>
-            <Link to='/cart'>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth={1.5}
-                stroke='currentColor'
-                className='h-8 w-8'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
-                />
-              </svg>
-            </Link>
+          <div className='col-span-1 justify-self-end'>
+            <Popover
+              placement='bottom-end'
+              renderPopover={
+                <div className='relative max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
+                  <div className='p-2'>
+                    <div className='capitalize text-gray-400'>Recenty Added Products</div>
+                    <div className='mt-5'>
+                      {initialProductCart.map((item) => (
+                        <div
+                          key={item.name}
+                          className='flex cursor-pointer justify-between gap-3 py-2 px-3 hover:bg-gray-50'
+                        >
+                          <img src={item.image} alt='anh' className='h-10 w-10 object-cover' />
+                          <div className='flex-grow gap-3 overflow-hidden'>
+                            <div className='truncate'>{item.name}</div>
+                          </div>
+                          <div className='flex-shrink text-orange'>
+                            <span>đ</span>
+                            <span>{item.price}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className='mt-5 mb-2 flex items-center justify-between px-3'>
+                      <div className='flex gap-1 text-xs capitalize'>
+                        <span className='text-left'>1</span>
+                        <span className='text-left'>More Products in Cart</span>
+                      </div>
+                      <Link
+                        to='/cart'
+                        className='rounded-sm bg-orange py-2 px-3 capitalize text-white hover:bg-opacity-[0.9]'
+                      >
+                        View My Shopping Cart
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              }
+            >
+              <Link to='/cart'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  strokeWidth={1.5}
+                  stroke='currentColor'
+                  className='h-8 w-8'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
+                  />
+                </svg>
+              </Link>
+            </Popover>
           </div>
         </div>
       </div>

@@ -7,7 +7,9 @@ import Input from 'src/components/Input'
 import { omit } from 'lodash'
 import { ISchema, schema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
-import { ResponseAPI } from 'src/types/utils.type'
+import { SuccessResponse } from 'src/types/utils.type'
+import { useContext } from 'react'
+import { AppContext } from 'src/contexts/app.context'
 
 export default function Register() {
   const {
@@ -18,7 +20,9 @@ export default function Register() {
   } = useForm<ISchema>({
     resolver: yupResolver(schema)
   })
+  const { setIsAuthenticated } = useContext(AppContext)
   const navigate = useNavigate()
+
   // registerMutations
   const registerAccountMutation = useMutation({
     mutationFn: (body: Omit<ISchema, 'confirm_password'>) => {
@@ -31,13 +35,12 @@ export default function Register() {
     registerAccountMutation.mutate(body, {
       onSuccess: (data) => {
         console.log('dateMutation', data)
-        alert('Register success, you will be redirect to login page')
-        setTimeout(() => {
-          navigate('/login')
-        }, 3000)
+
+        setIsAuthenticated(true)
+        navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<ResponseAPI<Omit<ISchema, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<SuccessResponse<Omit<ISchema, 'confirm_password'>>>(error)) {
           const formError = error.response?.data?.data
           // case 1
           // if (formError?.email) {

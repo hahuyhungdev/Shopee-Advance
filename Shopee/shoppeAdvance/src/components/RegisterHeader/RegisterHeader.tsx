@@ -1,7 +1,9 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useMatch } from 'react-router-dom'
 
 export default function RegisterHeader() {
+  const registerMatch = useMatch('/register')
+  const isRegister = Boolean(registerMatch)
   return (
     <header className='h-[84px] py-5'>
       <div className='container w-[1200px] md:flex md:items-center md:justify-between'>
@@ -13,7 +15,7 @@ export default function RegisterHeader() {
               </g>
             </svg>
           </Link>
-          <div className='ml-5 text-xl lg:text-2xl'>Đăng kí</div>
+          <div className='ml-5 text-xl lg:text-2xl'>{isRegister ? 'Register' : 'Login'}</div>
         </nav>
         <a
           href='https://help.shopee.vn/vn/s'
