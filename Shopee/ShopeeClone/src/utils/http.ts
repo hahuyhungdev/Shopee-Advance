@@ -40,10 +40,12 @@ export class Http {
         'expire-refresh-token': 60 * 60 * 24 * 160 // 160 ngày
       }
     })
+    // NOTE: when copy this code from document, REMEMBER to change the code below ( axios -> this.instance)
     this.instance.interceptors.request.use(
       (config) => {
         if (this.accessToken && config.headers) {
-          config.headers.authorization = this.accessToken
+          // config.headers.authorization = this.accessToken
+          config.headers.Authorization = this.accessToken
           return config
         }
         return config
