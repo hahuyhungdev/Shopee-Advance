@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import path from 'src/constants/path'
 import { logoutAccount } from 'src/apis/auth.api'
 import { AppContext } from 'src/contexts/app.context'
 import Popover from '../Popover'
@@ -40,13 +41,14 @@ const initialProductCart: ProductCartProps[] = [
 ]
 
 export default function Header() {
-  const { setIsAuthenticated, isAuthenticated } = useContext(AppContext)
+  const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
   const logoutMutation = useMutation({
     mutationFn: () => {
       return logoutAccount()
     },
     onSuccess: () => {
       setIsAuthenticated(false)
+      setProfile(null)
       toast.success('Logout success')
     }
   })
@@ -125,7 +127,7 @@ export default function Header() {
                 className='ml-6 flex cursor-pointer items-center py-1 hover:text-gray-300'
                 renderPopover={
                   <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
-                    <Link to='/profile' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
+                    <Link to={path.profile} className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
                       My Account
                     </Link>
                     <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
@@ -147,16 +149,16 @@ export default function Header() {
                     className='h-full w-full rounded-full object-cover'
                   />
                 </div>
-                <p>Ha Huy Hung</p>
+                <p>{profile?.email}</p>
               </Popover>
             )}
             {!isAuthenticated && (
               <div className='flex items-center'>
-                <Link to='/register' className='mx-3 capitalize hover:text-white/70'>
+                <Link to={path.register} className='mx-3 capitalize hover:text-white/70'>
                   Register
                 </Link>
                 <div className='h-4 border-r-[1px] border-white/40' />
-                <Link to='/login' className='mx-3 capitalize hover:text-white/70'>
+                <Link to={path.login} className='mx-3 capitalize hover:text-white/70'>
                   Login
                 </Link>
               </div>

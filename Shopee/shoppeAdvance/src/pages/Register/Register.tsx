@@ -10,6 +10,7 @@ import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { SuccessResponse } from 'src/types/utils.type'
 import { useContext } from 'react'
 import { AppContext } from 'src/contexts/app.context'
+import Button from 'src/components/Button'
 
 export default function Register() {
   const {
@@ -20,7 +21,7 @@ export default function Register() {
   } = useForm<ISchema>({
     resolver: yupResolver(schema)
   })
-  const { setIsAuthenticated } = useContext(AppContext)
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
 
   // registerMutations
@@ -34,9 +35,9 @@ export default function Register() {
     const body = omit(data, ['confirm_password'])
     registerAccountMutation.mutate(body, {
       onSuccess: (data) => {
-        console.log('dateMutation', data)
-
+        console.log('dataRegister Mutation', data)
         setIsAuthenticated(true)
+        setProfile(data.data.data.user)
         navigate('/')
       },
       onError: (error) => {
@@ -97,9 +98,13 @@ export default function Register() {
                 autoComplete='on'
                 errorMessage={errors.confirm_password?.message}
               />
-              <button className='w-full bg-red-500 py-4 px-2 text-center text-sm uppercase text-white hover:bg-red-600'>
+              <Button
+                isLoading={registerAccountMutation.isLoading}
+                disabled={registerAccountMutation.isLoading}
+                className='flex w-full justify-center bg-red-500 py-4 px-2 text-sm uppercase text-white hover:bg-red-600'
+              >
                 Đăng ký
-              </button>
+              </Button>
               <div className='mt-8 flex items-center justify-center gap-1 text-center'>
                 <span className='text-gray-400'>Do you have an account?</span>
                 <Link to='/login' className='text-red-400'>

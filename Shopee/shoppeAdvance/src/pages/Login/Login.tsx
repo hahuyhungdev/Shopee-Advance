@@ -4,6 +4,7 @@ import React, { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginAccount } from 'src/apis/auth.api'
+import Button from 'src/components/Button'
 import Input from 'src/components/Input'
 import { AppContext } from 'src/contexts/app.context'
 import { SuccessResponse } from 'src/types/utils.type'
@@ -11,7 +12,7 @@ import { ILoginSchema, loginSchema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 
 export default function Login() {
-  const { setIsAuthenticated } = useContext(AppContext)
+  const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
   const {
     handleSubmit,
@@ -35,6 +36,7 @@ export default function Login() {
       loginAccountMutation.mutate(data, {
         onSuccess: (data) => {
           console.log('data', data.data.data)
+          setProfile(data.data.data.user)
           setIsAuthenticated(true)
           navigate('/')
         },
@@ -81,9 +83,13 @@ export default function Login() {
                 register={register}
                 errorMessage={errors.password?.message}
               />
-              <button className='w-full bg-red-500 py-4 px-2 text-center text-sm uppercase text-white hover:bg-red-600'>
+              <Button
+                isLoading={loginAccountMutation.isLoading}
+                disabled={loginAccountMutation.isLoading}
+                className='flex w-full justify-center bg-red-500 px-2 py-4 text-sm uppercase text-white hover:bg-red-600'
+              >
                 Login
-              </button>
+              </Button>
               <div className='mt-9 flex items-center justify-center gap-1 text-center'>
                 <span className='text-gray-400'>Do not have an account?</span>
                 <Link to='/register' className='text-red-400'>

@@ -6,5 +6,5 @@ export type AuthResponse = SuccessResponse<{
   refresh_token: string
   expires: number
   expires_refresh_token: number
-  user: User[]
+  user: User
 }>
