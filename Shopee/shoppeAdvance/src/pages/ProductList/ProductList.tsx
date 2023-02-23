@@ -14,7 +14,7 @@ export default function ProductList() {
       return productApi.getProducts(queryParam)
     }
   })
-  console.log('data', productsQuery.data)
+  console.log('data', productsQuery.data?.data.data.products)
   return (
     <div className='bg-gray-200 py-6'>
       <div className='container'>
