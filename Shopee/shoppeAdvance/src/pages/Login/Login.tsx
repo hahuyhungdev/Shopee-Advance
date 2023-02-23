@@ -1,15 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
+import { HttpStatusCode } from 'axios'
 import React, { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { loginAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import Button from 'src/components/Button'
 import Input from 'src/components/Input'
 import { AppContext } from 'src/contexts/app.context'
 import { SuccessResponse } from 'src/types/utils.type'
 import { ILoginSchema, loginSchema } from 'src/utils/rules'
-import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
+import { isAxiosError, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
@@ -26,7 +27,7 @@ export default function Login() {
   // loginAccount Mutation
   const loginAccountMutation = useMutation({
     mutationFn: (body: ILoginSchema) => {
-      return loginAccount(body)
+      return authApi.loginAccount(body)
     }
   })
 
@@ -51,6 +52,9 @@ export default function Login() {
                 })
               })
             }
+          }
+          if (isAxiosError(error) && error.response?.status !== HttpStatusCode.UnprocessableEntity) {
+            console.log('errorAxios', error)
           }
         }
       })

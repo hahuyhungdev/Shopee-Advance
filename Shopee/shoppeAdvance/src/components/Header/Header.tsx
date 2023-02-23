@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import path from 'src/constants/path'
-import { logoutAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import { AppContext } from 'src/contexts/app.context'
 import Popover from '../Popover'
 
@@ -44,7 +44,7 @@ export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
   const logoutMutation = useMutation({
     mutationFn: () => {
-      return logoutAccount()
+      return authApi.logoutAccount()
     },
     onSuccess: () => {
       setIsAuthenticated(false)
@@ -179,7 +179,7 @@ export default function Header() {
                 placeholder='Free Shipping on Orders Over $50'
                 type='text'
                 name='search'
-                className='h-[34px] flex-grow border-none bg-transparent text-black outline-none'
+                className='h-[34px] flex-grow border-none bg-transparent p-2 text-black outline-none'
               />
               <button className='flex-shrink-0 rounded-sm bg-orange py-2 px-6 hover:opacity-90'>
                 <svg

@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import Input from 'src/components/Input'
 import { omit } from 'lodash'
 import { ISchema, schema } from 'src/utils/rules'
@@ -27,7 +27,7 @@ export default function Register() {
   // registerMutations
   const registerAccountMutation = useMutation({
     mutationFn: (body: Omit<ISchema, 'confirm_password'>) => {
-      return registerAccount(body)
+      return authApi.registerAccount(body)
     }
   })
   // handle submit
