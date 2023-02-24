@@ -18,7 +18,7 @@ export const AppContext = createContext<AppContextInterface>(initialAppContext)
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(initialAppContext.isAuthenticated)
   const [profile, setProfile] = useState(initialAppContext.profile)
-  console.log('profile', profile)
+
   return (
     <AppContext.Provider value={{ isAuthenticated, setIsAuthenticated, profile, setProfile }}>
       {children}
