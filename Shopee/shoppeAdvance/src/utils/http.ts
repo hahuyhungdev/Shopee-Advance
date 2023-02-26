@@ -3,6 +3,7 @@ import { toast } from 'react-toastify'
 import { AuthResponse } from 'src/types/auth.type'
 import path from 'src/constants/path'
 import { setAccessTokenToLS, getAccessTokenFromLS, clearLS, setProfileToLS } from './auth'
+import { URL_LOGIN, URL_LOGOUT, URL_REGISTER } from 'src/apis/auth.api'
 
 class Http {
   instance: AxiosInstance
@@ -35,13 +36,15 @@ class Http {
     this.instance.interceptors.response.use(
       (response) => {
         const { url } = response.config
-        if (url?.includes(path.login || path.register)) {
-          // console.log('response', response)
+        console.log('url', url, URL_LOGIN, URL_LOGOUT, URL_REGISTER)
+        if (url?.includes(URL_LOGIN) || url?.includes(URL_REGISTER)) {
+          console.log('response', response)
           const dataResponse = response.data as AuthResponse
           this.accessToken = dataResponse.data.access_token
           setAccessTokenToLS(this.accessToken)
           setProfileToLS(dataResponse.data.user)
         } else if (url?.includes(path.logout)) {
+          console.log('did logout')
           this.accessToken = ''
           clearLS()
         }
@@ -52,6 +55,7 @@ class Http {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const data: any | undefined = error.response?.data
           const message = data?.message || error.message
+          console.log('error', data?.message, error.message)
           toast.error(message)
         }
         return Promise.reject(error)

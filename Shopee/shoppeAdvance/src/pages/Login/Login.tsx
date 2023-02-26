@@ -9,9 +9,12 @@ import Button from 'src/components/Button'
 import Input from 'src/components/Input'
 import { AppContext } from 'src/contexts/app.context'
 import { SuccessResponse } from 'src/types/utils.type'
-import { ILoginSchema, loginSchema } from 'src/utils/rules'
+import { Schema, schema } from 'src/utils/rules'
+
 import { isAxiosError, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 
+type FormData = Pick<Schema, 'email' | 'password'>
+export const loginSchema = schema.pick(['email', 'password'])
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
@@ -20,13 +23,13 @@ export default function Login() {
     register,
     setError,
     formState: { errors }
-  } = useForm<ILoginSchema>({
+  } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
   })
 
   // loginAccount Mutation
   const loginAccountMutation = useMutation({
-    mutationFn: (body: ILoginSchema) => {
+    mutationFn: (body: FormData) => {
       return authApi.loginAccount(body)
     }
   })
@@ -42,13 +45,13 @@ export default function Login() {
           navigate('/')
         },
         onError: (error) => {
-          if (isAxiosUnprocessableEntityError<SuccessResponse<ILoginSchema>>(error)) {
+          if (isAxiosUnprocessableEntityError<SuccessResponse<FormData>>(error)) {
             const formError = error.response?.data?.data
             if (formError) {
               Object.keys(formError).forEach((key) => {
-                setError(key as keyof ILoginSchema, {
+                setError(key as keyof FormData, {
                   type: 'Server',
-                  message: formError[key as keyof ILoginSchema]
+                  message: formError[key as keyof FormData]
                 })
               })
             }

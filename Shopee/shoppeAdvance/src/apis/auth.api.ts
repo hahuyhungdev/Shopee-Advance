@@ -13,7 +13,7 @@ const authApi = {
     return http.post<AuthResponse>(URL_LOGIN, body)
   },
   logoutAccount() {
-    http.post('/logout')
+    return http.post('/logout')
   }
 }
 export default authApi
