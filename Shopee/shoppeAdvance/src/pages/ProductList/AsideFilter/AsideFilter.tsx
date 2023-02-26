@@ -1,21 +1,79 @@
 import clsx from 'clsx'
+import { useForm, Controller } from 'react-hook-form'
 import { AiFillStar } from 'react-icons/ai'
 import { CiFilter } from 'react-icons/ci'
 import { TfiMenuAlt } from 'react-icons/tfi'
-import { createSearchParams, Link } from 'react-router-dom'
+import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import Button from 'src/components/Button'
-import Input from 'src/components/Input'
+import InputNumber from 'src/components/InputNumber'
 import path from 'src/constants/path'
 import { Category } from 'src/types/category.type'
 import { QueryConfig } from '../ProductList'
+import { schema } from 'src/utils/rules'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { NoUndefinedField } from 'src/types/utils.type'
 
 interface Props {
   queryConfig: QueryConfig
   categories: Category[]
 }
+/*
+ * Rules validate for form
+ * If have price_min and price_max, price_min must be less than price_max
+ * If have price min can haven't price max and vice versa
+ */
+// type FormData = {
+//   price_min: string
+//   price_max: string
+// }
+type FormData = NoUndefinedField<Pick<QueryConfig, 'price_min' | 'price_max'>>
+/*
+ * 1. pick only price_min and price_max
+ * 2. use yupResolver to validate
+ * 3. use shouldFocusError: false to prevent focus on error
+ * 4. use trigger to trigger validation
+ * 5. use handleSubmit to handle submit
+ * 6. use navigate to navigate to new url with new query params
+ * 7. use createSearchParams to create new query params
+ * 8. use path.home to get home path
+ * 9. use queryConfig to get current query params
+ */
+const priceSchema = schema.pick(['price_min', 'price_max'])
 export default function AsideFilter({ categories, queryConfig }: Props) {
   const { category } = queryConfig
-  console.log('categories', category, categories)
+  const {
+    control,
+    trigger,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<FormData>({
+    defaultValues: {
+      price_min: '',
+      price_max: ''
+    },
+    resolver: yupResolver(priceSchema),
+    shouldFocusError: false
+  })
+  const navigate = useNavigate()
+  // console.log('errors', errors)
+  // console.log('categories', category, categories)
+  // handle submit
+  const onSubmit = handleSubmit((data) => {
+    navigate({
+      pathname: path.home,
+      search: createSearchParams({
+        ...queryConfig,
+        price_min: data.price_min,
+        price_max: data.price_max
+      }).toString()
+    })
+  })
+  // demo error
+  // (error: any) => {
+  //   console.log('error', error)
+  //   error.price_max?.ref?.focus()
+  // })
+
   return (
     <div className='py-4'>
       <Link to={path.home} className='flex items-center font-bold'>
@@ -53,21 +111,6 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
           )
         })}
       </ul>
-      {/* <ul className='py-2 pl-2'>
-        <li className='py-2 pl-2'>
-          <Link to={path.home} className='relative flex items-center px-2 font-semibold text-orange'>
-            <svg viewBox='0 0 4 7' className='tp[-1 absolute left-[-10px] mr-2 h-2 w-2 fill-orange'>
-              <polygon points='4 3.5 0 0 0 7' />
-            </svg>
-            <span>Men Fashion</span>
-          </Link>
-        </li>
-        <li className='pl-2'>
-          <Link to={path.home} className='relative flex items-center px-2 text-orange'>
-            <span>Telephone</span>
-          </Link>
-        </li>
-      </ul> */}
       <Link to={path.home} className='mt-4 flex items-center font-bold'>
         <CiFilter className='mr-3 h-4 w-3 fill-current' />
         <span>Filter</span>
@@ -75,24 +118,58 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
       <div className='mt-4 mb-2 h-[1px] bg-gray-300' />
       <div className='my-4'>
         <div className='mb-2 text-sm'>Range Price</div>
-        <form className='m2-2'>
+        <form className='m2-2' onSubmit={onSubmit}>
           <div className='flex items-start'>
-            <Input
-              type='text'
-              className='grow'
-              name='from'
-              placeholder='₫ MIN'
-              classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
+            <Controller
+              control={control}
+              name='price_min'
+              render={({ field }) => {
+                return (
+                  <InputNumber
+                    type='text'
+                    className='grow'
+                    name='from'
+                    classNameError='hidden'
+                    placeholder='₫ MIN'
+                    onChange={(e) => {
+                      field.onChange(e)
+                      trigger('price_max')
+                    }}
+                    value={field.value}
+                    // because we use react-hook-form, we need to use ref
+                    // however, we can't pass ref of InputNumber, so we must convert component to -- forwardRef -- should pass ref
+                    ref={field.ref}
+                    classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
+                    // take note: here, we can use {...field} to pass all properties of field to InputNumber ( you can click to see properties of field)
+                  />
+                )
+              }}
             />
             <div className='mx-2 mt-1 shrink-0'>-</div>
-            <Input
-              type='text'
-              className='grow'
-              name='from'
-              placeholder='₫ MAX'
-              classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
+            <Controller
+              control={control}
+              name='price_max'
+              render={({ field }) => {
+                return (
+                  <InputNumber
+                    type='text'
+                    className='grow'
+                    name='from'
+                    placeholder='₫ MAX'
+                    classNameError='hidden'
+                    onChange={(e) => {
+                      field.onChange(e)
+                      trigger('price_min')
+                    }}
+                    value={field.value}
+                    ref={field.ref}
+                    classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
+                  />
+                )
+              }}
             />
           </div>
+          <div className='mt-1 min-h-[1.5rem] text-sm text-red-600'>{errors.price_min?.message}</div>
           <Button className='w-full items-center justify-center rounded-sm bg-orange p-2 text-sm uppercase text-white hover:bg-orange/90'>
             Apply
           </Button>

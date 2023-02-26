@@ -18,6 +18,7 @@ export const loginSchema = schema.pick(['email', 'password'])
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
+
   const {
     handleSubmit,
     register,
