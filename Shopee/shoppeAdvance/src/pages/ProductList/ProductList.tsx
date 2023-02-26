@@ -16,7 +16,8 @@ export type QueryConfig = {
 export default function ProductList() {
   const queryParam: QueryConfig = useQueryParam()
 
-  // Explain: hear, we use lodash to omit undefined value in queryParam. Because we don't want to send undefined value to server
+  // Explain: hear, we use lodash to omit undefined value in queryParam.
+  //Because we don't want to send undefined value to server
   const queryConfig: QueryConfig = omitBy(
     {
       page: queryParam.page || '1',
