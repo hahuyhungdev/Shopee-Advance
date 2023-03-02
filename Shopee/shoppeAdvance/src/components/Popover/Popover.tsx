@@ -46,6 +46,7 @@ export default function Popover({
               transition={{ duration: 0.2 }}
               ref={floating}
               style={{
+                zIndex: 50,
                 position: strategy,
                 top: y ?? 0,
                 left: x ?? 0,
@@ -54,7 +55,7 @@ export default function Popover({
               }}
             >
               <span
-                className='absolute z-10 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent border-b-white'
+                className='absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent border-b-white'
                 ref={arrowRef}
                 style={{
                   left: middlewareData.arrow?.x,

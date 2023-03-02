@@ -5,9 +5,9 @@ import productApi from 'src/apis/product.api'
 import Pagination from 'src/components/Pagination'
 import useQueryParam from 'src/hooks/useQueryParam'
 import { ProductListConfig } from 'src/types/product.type'
-import AsideFilter from './AsideFilter'
-import Product from './Product/Product'
-import SortProductList from './SortProductList'
+import AsideFilter from './components/AsideFilter'
+import Product from './components/Product/Product'
+import SortProductList from './components/SortProductList'
 import categoryApi from 'src/apis/categoriest'
 
 export type QueryConfig = {
@@ -59,7 +59,7 @@ export default function ProductList() {
           </div>
 
           {productsData && (
-            <div className='col-span-9'>
+            <div className='sticky z-10 col-span-9'>
               <SortProductList queryConfig={queryConfig} pageSize={productsData.data.data.pagination.page_size} />
               <div className='mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
                 {productsData.data.data.products.map((product) => (

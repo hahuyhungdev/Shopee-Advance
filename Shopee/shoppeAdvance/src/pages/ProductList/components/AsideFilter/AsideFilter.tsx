@@ -8,10 +8,12 @@ import Button from 'src/components/Button'
 import InputNumber from 'src/components/InputNumber'
 import path from 'src/constants/path'
 import { Category } from 'src/types/category.type'
-import { QueryConfig } from '../ProductList'
+import { QueryConfig } from '../../ProductList'
 import { schema } from 'src/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NoUndefinedField } from 'src/types/utils.type'
+import RatingStars from '../RatingStars/RatingStarts'
+import { omit } from 'lodash'
 
 interface Props {
   queryConfig: QueryConfig
@@ -45,6 +47,7 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
     control,
     trigger,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<FormData>({
     defaultValues: {
@@ -74,9 +77,17 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
   //   error.price_max?.ref?.focus()
   // })
 
+  const handleRemoveAll = () => {
+    // on reset to reset form
+    reset()
+    navigate({
+      pathname: path.home,
+      search: createSearchParams(omit(queryConfig, ['price_min', 'price_max', 'rating_filter', 'category'])).toString()
+    })
+  }
   return (
-    <div className='py-4'>
-      <Link to={path.home} className='flex items-center font-bold'>
+    <div className='sticky top-[8rem] rounded-sm border-2 py-4'>
+      <Link to={path.home} className=' flex items-center font-bold'>
         <TfiMenuAlt className='mr-3 h-4 w-3 fill-current' />
         <span>All Products</span>
       </Link>
@@ -178,26 +189,14 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
       <div className='mt-4 mb-2 h-[1px] bg-gray-300' />
       <div className='my-4'>
         <div className='text-sm'>Review</div>
-        <ul className='my-1'>
-          {Array(5)
-            .fill(0)
-            .map((_, index) => (
-              <li className='py-1 px-1' key={index}>
-                <Link to={path.home} className='flex items-center'>
-                  {Array(5)
-                    .fill(0)
-                    .map((_, index) => (
-                      <AiFillStar key={index} className='mr-[3px] h-4 w-4 fill-[#ffad27]' />
-                    ))}
-                  <span>UP</span>
-                </Link>
-              </li>
-            ))}
-        </ul>
+        <RatingStars queryConfig={queryConfig} />
       </div>
       <div className='mt-4 mb-2 h-[1px] bg-gray-300' />
-      <Button className='w-full items-center justify-center rounded-sm bg-orange p-2 text-sm uppercase text-white hover:bg-orange/90'>
-        Delete All
+      <Button
+        onClick={handleRemoveAll}
+        className='flex w-full items-center justify-center bg-orange p-2 text-sm uppercase text-white hover:bg-orange/80'
+      >
+        Xóa tất cả
       </Button>
     </div>
   )

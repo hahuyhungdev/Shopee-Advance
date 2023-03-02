@@ -59,7 +59,7 @@ export default function Header() {
   }
 
   return (
-    <div className='transition-[transform .2s cubic-bezier(.4,0,.2,1)] bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
+    <div className='sticky top-0 z-20 bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white transition-[transform.2scubic-bezier(.4,0,.2,1)]'>
       <div className='container'>
         <div className='flex justify-between'>
           <div className='flex justify-start gap-x-3'>
@@ -86,7 +86,7 @@ export default function Header() {
           <div className='flex justify-end'>
             <Popover
               as={'span'}
-              className='flex cursor-pointer items-center py-1 hover:text-gray-300'
+              className='relative flex cursor-pointer items-center py-1 hover:text-gray-300'
               renderPopover={
                 <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
                   <div className='flex flex-col py-2 pl-3 pr-28'>
@@ -203,7 +203,7 @@ export default function Header() {
             <Popover
               placement='bottom-end'
               renderPopover={
-                <div className='relative max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
+                <div className='relative z-30 max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
                   <div className='p-2'>
                     <div className='capitalize text-gray-400'>Recenty Added Products</div>
                     <div className='mt-5'>
