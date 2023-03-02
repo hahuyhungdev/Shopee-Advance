@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import path from 'src/constants/path'
-import { logoutAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import { AppContext } from 'src/contexts/app.context'
 import Popover from '../Popover'
 
@@ -44,7 +44,7 @@ export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
   const logoutMutation = useMutation({
     mutationFn: () => {
-      return logoutAccount()
+      return authApi.logoutAccount()
     },
     onSuccess: () => {
       setIsAuthenticated(false)
@@ -59,7 +59,7 @@ export default function Header() {
   }
 
   return (
-    <div className='transition-[transform .2s cubic-bezier(.4,0,.2,1)] bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white'>
+    <div className='sticky top-0 z-20 bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white transition-[transform.2scubic-bezier(.4,0,.2,1)]'>
       <div className='container'>
         <div className='flex justify-between'>
           <div className='flex justify-start gap-x-3'>
@@ -86,7 +86,7 @@ export default function Header() {
           <div className='flex justify-end'>
             <Popover
               as={'span'}
-              className='flex cursor-pointer items-center py-1 hover:text-gray-300'
+              className='relative flex cursor-pointer items-center py-1 hover:text-gray-300'
               renderPopover={
                 <div className='relative rounded-sm border border-gray-200 bg-white shadow-md'>
                   <div className='flex flex-col py-2 pl-3 pr-28'>
@@ -179,7 +179,7 @@ export default function Header() {
                 placeholder='Free Shipping on Orders Over $50'
                 type='text'
                 name='search'
-                className='h-[34px] flex-grow border-none bg-transparent text-black outline-none'
+                className='h-[34px] flex-grow border-none bg-transparent p-2 text-black outline-none'
               />
               <button className='flex-shrink-0 rounded-sm bg-orange py-2 px-6 hover:opacity-90'>
                 <svg
@@ -203,7 +203,7 @@ export default function Header() {
             <Popover
               placement='bottom-end'
               renderPopover={
-                <div className='relative max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
+                <div className='relative z-30 max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
                   <div className='p-2'>
                     <div className='capitalize text-gray-400'>Recenty Added Products</div>
                     <div className='mt-5'>

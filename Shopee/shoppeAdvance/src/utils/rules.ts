@@ -69,7 +69,13 @@ export const getRulse = (
     }
   }
 })
-
+function testPriceMinMax(this: yup.TestContext<yup.AnyObject>) {
+  const { price_max, price_min } = this.parent as { price_min: string; price_max: string }
+  if (price_min !== '' && price_max !== '') {
+    return Number(price_max) >= Number(price_min)
+  }
+  return price_min !== '' || price_max !== ''
+}
 export const schema = yup.object({
   email: yup
     .string()
@@ -86,16 +92,24 @@ export const schema = yup.object({
     .required('Password does not exist')
     .min(6, 'Password must have at least 6 characters')
     .max(20, 'Password must have at most 20 characters'),
-
   confirm_password: yup
     .string()
     .required('Must have confirm password')
     .min(6, 'Password must have at least 6 characters')
     .max(20, 'Password must have at most 20 characters')
-    .oneOf([yup.ref('password')], 'Passwords must match')
+    .oneOf([yup.ref('password')], 'Passwords must match'),
+  price_min: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'Price min must be less than price max',
+    test: testPriceMinMax
+  }),
+  price_max: yup.string().test({
+    name: 'price-not-allowed',
+    message: 'Price max must be greater than price min',
+    test: testPriceMinMax
+  })
 })
-export type ISchema = yup.InferType<typeof schema>
+export type Schema = yup.InferType<typeof schema>
 // example if want to use yup with schema fields
-export const loginSchema = schema.omit(['confirm_password'])
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type ILoginSchema = yup.InferType<typeof loginSchema>
+// export const loginSchema = schema.omit(['confirm_password'])
+// export type ILoginSchema = yup.InferType<typeof loginSchema>

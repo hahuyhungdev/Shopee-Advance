@@ -1,32 +1,37 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
+import { HttpStatusCode } from 'axios'
 import React, { useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { loginAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import Button from 'src/components/Button'
 import Input from 'src/components/Input'
 import { AppContext } from 'src/contexts/app.context'
 import { SuccessResponse } from 'src/types/utils.type'
-import { ILoginSchema, loginSchema } from 'src/utils/rules'
-import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
+import { Schema, schema } from 'src/utils/rules'
 
+import { isAxiosError, isAxiosUnprocessableEntityError } from 'src/utils/utils'
+
+type FormData = Pick<Schema, 'email' | 'password'>
+export const loginSchema = schema.pick(['email', 'password'])
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
+
   const {
     handleSubmit,
     register,
     setError,
     formState: { errors }
-  } = useForm<ILoginSchema>({
+  } = useForm<FormData>({
     resolver: yupResolver(loginSchema)
   })
 
   // loginAccount Mutation
   const loginAccountMutation = useMutation({
-    mutationFn: (body: ILoginSchema) => {
-      return loginAccount(body)
+    mutationFn: (body: FormData) => {
+      return authApi.loginAccount(body)
     }
   })
 
@@ -41,16 +46,19 @@ export default function Login() {
           navigate('/')
         },
         onError: (error) => {
-          if (isAxiosUnprocessableEntityError<SuccessResponse<ILoginSchema>>(error)) {
+          if (isAxiosUnprocessableEntityError<SuccessResponse<FormData>>(error)) {
             const formError = error.response?.data?.data
             if (formError) {
               Object.keys(formError).forEach((key) => {
-                setError(key as keyof ILoginSchema, {
+                setError(key as keyof FormData, {
                   type: 'Server',
-                  message: formError[key as keyof ILoginSchema]
+                  message: formError[key as keyof FormData]
                 })
               })
             }
+          }
+          if (isAxiosError(error) && error.response?.status !== HttpStatusCode.UnprocessableEntity) {
+            console.log('errorAxios', error)
           }
         }
       })

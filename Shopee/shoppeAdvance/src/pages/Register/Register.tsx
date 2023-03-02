@@ -2,36 +2,40 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerAccount } from 'src/apis/auth.api'
+import authApi from 'src/apis/auth.api'
 import Input from 'src/components/Input'
 import { omit } from 'lodash'
-import { ISchema, schema } from 'src/utils/rules'
+import { Schema, schema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { SuccessResponse } from 'src/types/utils.type'
 import { useContext } from 'react'
 import { AppContext } from 'src/contexts/app.context'
 import Button from 'src/components/Button'
 
+type FormData = Pick<Schema, 'email' | 'password' | 'confirm_password'>
+export const registerSchema = schema.pick(['email', 'password', 'confirm_password'])
 export default function Register() {
   const {
     handleSubmit,
     register,
     setError,
     formState: { errors }
-  } = useForm<ISchema>({
-    resolver: yupResolver(schema)
+  } = useForm<FormData>({
+    resolver: yupResolver(registerSchema)
   })
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
 
   // registerMutations
   const registerAccountMutation = useMutation({
-    mutationFn: (body: Omit<ISchema, 'confirm_password'>) => {
-      return registerAccount(body)
+    mutationFn: (body: Omit<Schema, 'confirm_password'>) => {
+      return authApi.registerAccount(body)
     }
   })
   // handle submit
   const onSubmit = handleSubmit((data) => {
+    console.log('data', data)
+    console.log('errors', errors)
     const body = omit(data, ['confirm_password'])
     registerAccountMutation.mutate(body, {
       onSuccess: (data) => {
@@ -41,7 +45,7 @@ export default function Register() {
         navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<SuccessResponse<Omit<ISchema, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<SuccessResponse<Omit<Schema, 'confirm_password'>>>(error)) {
           const formError = error.response?.data?.data
           // case 1
           // if (formError?.email) {
@@ -55,12 +59,14 @@ export default function Register() {
           // but in case have many error, we can use Object.keys to loop all error
           if (formError) {
             Object.keys(formError).forEach((key) => {
-              setError(key as keyof Omit<ISchema, 'confirm_password'>, {
+              setError(key as keyof Omit<FormData, 'confirm_password'>, {
                 type: 'Server',
-                message: formError[key as keyof Omit<ISchema, 'confirm_password'>]
+                message: formError[key as keyof Omit<FormData, 'confirm_password'>]
               })
             })
           }
+        } else {
+          console.log('error', error)
         }
       }
     })
