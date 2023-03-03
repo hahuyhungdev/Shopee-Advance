@@ -2,6 +2,7 @@ import React, { useRef, useId, ElementType } from 'react'
 
 import { arrow, FloatingPortal, offset, shift, useFloating, type Placement } from '@floating-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import clsx from 'clsx'
 
 interface Props {
   children: React.ReactNode
@@ -10,6 +11,7 @@ interface Props {
   as?: ElementType
   initialOpen?: boolean
   placement?: Placement
+  borderSpan?: boolean
 }
 export default function Popover({
   children,
@@ -17,7 +19,8 @@ export default function Popover({
   className,
   as: Element = 'div',
   initialOpen,
-  placement
+  placement,
+  borderSpan = false
 }: Props) {
   const [open, setOpen] = React.useState(initialOpen ?? false)
   const arrowRef = useRef<HTMLElement>(null)
@@ -34,7 +37,13 @@ export default function Popover({
     setOpen(initialOpen ?? false)
   }
   return (
-    <Element className={className} ref={reference} onMouseEnter={showPopover} onMouseLeave={hidePopover}>
+    <Element
+      className={className}
+      ref={reference}
+      onMouseEnter={showPopover}
+      onMouseLeave={hidePopover}
+      borderSpan={borderSpan}
+    >
       {children}
       <FloatingPortal id={idPopover}>
         <AnimatePresence>
@@ -55,7 +64,13 @@ export default function Popover({
               }}
             >
               <span
-                className='absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent border-b-white'
+                className={clsx(
+                  'absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent',
+                  {
+                    'border-b-gray-200': borderSpan,
+                    'border-b-white': !borderSpan
+                  }
+                )}
                 ref={arrowRef}
                 style={{
                   left: middlewareData.arrow?.x,

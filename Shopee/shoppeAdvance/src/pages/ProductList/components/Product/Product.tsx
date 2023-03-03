@@ -1,16 +1,14 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
-import { IconStar } from 'src/components/Icons'
 import ProductRating from 'src/components/ProductRating'
+import path from 'src/constants/path'
 import { Product as ProductType } from 'src/types/product.type'
 import { formatCurrency, formatNumberToSocialStyle } from 'src/utils/utils'
-
 interface Props {
   product: ProductType
 }
 export default function Product({ product }: Props) {
   return (
-    <Link to='/'>
+    <Link to={`${path.home}${product._id}`}>
       <div
         className='overflow-hidden rounded-sm bg-white shadow transition-transform
       duration-100 hover:translate-y-[-0.04rem] hover:shadow-md'
