@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import productApi from 'src/apis/product.api'
 import ProductRating from 'src/components/ProductRating'
@@ -8,7 +8,12 @@ import { CiCircleQuestion } from 'react-icons/ci'
 import Popover from 'src/components/Popover'
 import InputNumber from 'src/components/InputNumber'
 import DOMPurify from 'dompurify'
+import { Product } from 'src/types/product.type'
 export default function ProductDetail() {
+  const [currentIndexImages, setCurrentIndexImages] = useState([0, 5])
+  const [activeImage, setActiveImage] = useState('')
+
+  // get id from url
   const { id } = useParams()
   // Product flow id use query to get data from server
   const { data: ProductDetailData } = useQuery({
@@ -17,21 +22,51 @@ export default function ProductDetail() {
       return productApi.getProductDetail(id as string)
     }
   })
-  console.log(ProductDetailData?.data.data)
   const product = ProductDetailData?.data.data
+  console.log(product)
+  // set current images
+  const currentImages = useMemo(() => {
+    if (!product) return []
+    return product ? product.images.slice(...currentIndexImages) : []
+  }, [currentIndexImages, product])
+
+  useEffect(() => {
+    if (product && product.images.length > 0) {
+      setActiveImage(product.images[0])
+    }
+  }, [product])
+
+  const next = () => {
+    if (currentIndexImages[1] < (product as Product).images.length) {
+      setCurrentIndexImages((prev) => [prev[0] + 1, prev[1] + 1])
+    }
+  }
+  const prev = () => {
+    if (currentIndexImages[0] > 0) {
+      setCurrentIndexImages((prev) => [prev[0] - 1, prev[1] - 1])
+    }
+  }
+
+  const chooseActive = (img: string) => {
+    setActiveImage(img)
+  }
+
   if (!product) return null
   return (
     <div className='bg-gray-200 py-6'>
       <title>{product.name} | Shopee Clone</title>
-      <div className='bg-white p-4 shadow'>
-        <div className='container'>
+      <div className='container max-w-[1200px]'>
+        <div className='bg-white p-4 shadow'>
           <div className='grid grid-cols-12 gap-9'>
-            <div className='col-span-5'>
+            <div className='col-span-5 cursor-pointer'>
               <div className='relative w-full pt-[100%] shadow'>
-                <img src={product.image} alt={product.name} className='absolute inset-0 h-full w-full object-cover' />
+                <img src={activeImage} alt={product.name} className='absolute inset-0 h-full w-full object-cover' />
               </div>
               <div className='relative mt-4 grid grid-cols-5 gap-1'>
-                <button className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  onClick={prev}
+                  className='absolute left-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
@@ -43,10 +78,14 @@ export default function ProductDetail() {
                     <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
                   </svg>
                 </button>
-                {product.images.slice(0, 5).map((image, index) => {
-                  const isActive = index === 0
+                {currentImages.map((image) => {
+                  const isActive = activeImage === image
                   return (
-                    <div className='relative w-full pt-[100%] shadow' key={index}>
+                    <div
+                      className='relative w-full pt-[100%] shadow'
+                      key={image}
+                      onMouseEnter={() => chooseActive(image)}
+                    >
                       <img
                         src={image}
                         alt={image}
@@ -56,7 +95,10 @@ export default function ProductDetail() {
                     </div>
                   )
                 })}
-                <button className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'>
+                <button
+                  onClick={next}
+                  className='absolute right-0 top-1/2 z-10 h-9 w-5 -translate-y-1/2 bg-black/20 text-white'
+                >
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
@@ -102,7 +144,7 @@ export default function ProductDetail() {
                     </div>
                   }
                   placement='bottom'
-                  borderSpan={true}
+                  // borderSpan={true}
                 >
                   <CiCircleQuestion className='ml-2 h-5 w-5 fill-gray-500' />
                 </Popover>
@@ -187,8 +229,8 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-      <div className='mt-8 bg-white p-4 shadow'>
-        <div className='container'>
+      <div className='container'>
+        <div className='mt-8 bg-white p-4 shadow'>
           <div className='rounder-sm bg-gray-50 p-2 text-lg capitalize text-slate-700'>Description</div>
           <div className='mx-4 mt-4 mb-4 text-sm leading-loose'>
             <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }} />

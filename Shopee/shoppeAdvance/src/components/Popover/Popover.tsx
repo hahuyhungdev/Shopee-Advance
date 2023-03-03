@@ -67,6 +67,7 @@ export default function Popover({
                 className={clsx(
                   'absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent',
                   {
+                    // borderSpan, if true border-b-gray-200 else border-b-white
                     'border-b-gray-200': borderSpan,
                     'border-b-white': !borderSpan
                   }
