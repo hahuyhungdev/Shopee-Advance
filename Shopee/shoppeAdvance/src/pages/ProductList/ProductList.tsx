@@ -1,21 +1,31 @@
 import { useQuery } from '@tanstack/react-query'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { omitBy, isUndefined } from 'lodash'
 import productApi from 'src/apis/product.api'
-import Pagination from 'src/components/Pagination'
+
 import useQueryParam from 'src/hooks/useQueryParam'
 import { ProductListConfig } from 'src/types/product.type'
 import AsideFilter from './components/AsideFilter'
 import Product from './components/Product/Product'
 import SortProductList from './components/SortProductList'
 import categoryApi from 'src/apis/categoriest'
+import Page from 'src/components/PaginationAnt'
+import { Pagination as PaginationAnt } from 'antd'
+import Pagination from 'src/components/Pagination'
 
 export type QueryConfig = {
   [key in keyof ProductListConfig]: string
 }
 export default function ProductList() {
+  const DEFAULT_PARAMS = {
+    page: 1,
+    limit: 10
+  }
+  const [params, setParams] = useState(DEFAULT_PARAMS)
+
   const queryParam: QueryConfig = useQueryParam()
 
+  // console.log('queryParam', queryParam)
   // Explain: hear, we use lodash to omit undefined value in queryParam.
   //Because we don't want to send undefined value to server
   const queryConfig: QueryConfig = omitBy(
@@ -36,8 +46,10 @@ export default function ProductList() {
   // Product list use query to get data from server
   const { data: productsData } = useQuery({
     queryKey: ['products', queryConfig],
+    // queryKey: ['products', params],
     queryFn: () => {
       return productApi.getProducts(queryConfig as ProductListConfig)
+      // return productApi.getProducts(params)
     },
     // keep previous data when refetching not laq when click or change page
     keepPreviousData: true
@@ -50,6 +62,8 @@ export default function ProductList() {
       return categoryApi.getCategories()
     }
   })
+
+  console.log(productsData?.data.data)
   return (
     <div className='bg-gray-200 py-6'>
       <div className='container'>
@@ -72,6 +86,15 @@ export default function ProductList() {
               Because productsQuery can be undefined, so we need to check it. should give move check "data" to the over of the code
               */}
               <Pagination queryConfig={queryConfig} pageSize={productsData.data.data.pagination.page_size} />
+              {/* <PaginationAnt
+                showSizeChanger
+                onChange={(page, pageSize) => {
+                  setParams({ page, limit: pageSize })
+                }}
+                pageSize={params.limit}
+                current={params.page}
+                total={55}
+              /> */}
             </div>
           )}
         </div>

@@ -11,7 +11,6 @@ interface Props {
   as?: ElementType
   initialOpen?: boolean
   placement?: Placement
-  borderSpan?: boolean
 }
 export default function Popover({
   children,
@@ -19,8 +18,7 @@ export default function Popover({
   className,
   as: Element = 'div',
   initialOpen,
-  placement,
-  borderSpan = false
+  placement
 }: Props) {
   const [open, setOpen] = React.useState(initialOpen ?? false)
   const arrowRef = useRef<HTMLElement>(null)
@@ -37,13 +35,7 @@ export default function Popover({
     setOpen(initialOpen ?? false)
   }
   return (
-    <Element
-      className={className}
-      ref={reference}
-      onMouseEnter={showPopover}
-      onMouseLeave={hidePopover}
-      borderSpan={borderSpan}
-    >
+    <Element className={className} ref={reference} onMouseEnter={showPopover} onMouseLeave={hidePopover}>
       {children}
       <FloatingPortal id={idPopover}>
         <AnimatePresence>
@@ -65,12 +57,7 @@ export default function Popover({
             >
               <span
                 className={clsx(
-                  'absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent',
-                  {
-                    // borderSpan, if true border-b-gray-200 else border-b-white
-                    'border-b-gray-200': borderSpan,
-                    'border-b-white': !borderSpan
-                  }
+                  'absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent'
                 )}
                 ref={arrowRef}
                 style={{

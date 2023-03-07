@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import productApi from 'src/apis/product.api'
 import ProductRating from 'src/components/ProductRating'
-import { formatCurrency, formatNumberToSocialStyle, rateSale } from 'src/utils/utils'
+import { formatCurrency, formatNumberToSocialStyle, getIdFromNameId, rateSale } from 'src/utils/utils'
 import { CiCircleQuestion } from 'react-icons/ci'
 import Popover from 'src/components/Popover'
 import InputNumber from 'src/components/InputNumber'
@@ -13,15 +13,17 @@ export default function ProductDetail() {
   const [currentIndexImages, setCurrentIndexImages] = useState([0, 5])
   const [activeImage, setActiveImage] = useState('')
 
-  // get id from url
-  const { id } = useParams()
+  // get productId from url
+  const { productId } = useParams()
+  const id = getIdFromNameId(productId as string)
   // Product flow id use query to get data from server
   const { data: ProductDetailData } = useQuery({
     queryKey: ['ProductDetail', id],
     queryFn: () => {
-      return productApi.getProductDetail(id as string)
+      return productApi.getProductDetail(id)
     }
   })
+  const imageRef = useRef<HTMLImageElement>(null)
   const product = ProductDetailData?.data.data
   console.log(product)
   // set current images
@@ -50,6 +52,30 @@ export default function ProductDetail() {
   const chooseActive = (img: string) => {
     setActiveImage(img)
   }
+  const handleZoom = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const react = event.currentTarget.getBoundingClientRect()
+    const image = imageRef.current as HTMLImageElement
+    const { naturalHeight, naturalWidth } = image
+    // now here, we have 2 ways to calculate the position of the image
+    // 1. use the offset(offsetX, offsetY to event.navtiveEvent) of the mouse to the component. When we did handle "bubble event"
+    // const { offsetX, offsetY } = event.nativeEvent
+    // 2. get offsetX, offsetY when we not handle "bubble event". Now, we dont need to use "pointer-events: none" to identify the image
+    const offsetX = event.pageX - (react.x + window.scrollX)
+    const offsetY = event.pageY - (react.y + window.scrollY)
+
+    const top = offsetY * (1 - naturalHeight / react.height)
+    const left = offsetX * (1 - naturalWidth / react.width)
+    console.log(top, left)
+    image.style.width = `${naturalWidth}px`
+    image.style.height = `${naturalHeight}px`
+    image.style.top = `${top}px`
+    image.style.left = `${left}px`
+    image.style.maxWidth = 'unset'
+  }
+
+  const handleRemoveZoom = () => {
+    imageRef.current?.removeAttribute('style')
+  }
 
   if (!product) return null
   return (
@@ -59,8 +85,19 @@ export default function ProductDetail() {
         <div className='bg-white p-4 shadow'>
           <div className='grid grid-cols-12 gap-9'>
             <div className='col-span-5 cursor-pointer'>
-              <div className='relative w-full pt-[100%] shadow'>
-                <img src={activeImage} alt={product.name} className='absolute inset-0 h-full w-full object-cover' />
+              {/* The "pointer-events" CSS property sets under what circumstances (if any) a particular graphic element can
+              become the target of pointer events. */}
+              <div
+                className='relative w-full cursor-zoom-in overflow-hidden pt-[100%] shadow'
+                onMouseMove={handleZoom}
+                onMouseLeave={handleRemoveZoom}
+              >
+                <img
+                  src={activeImage}
+                  alt={product.name}
+                  className=' absolute inset-0 h-full w-full object-cover'
+                  ref={imageRef}
+                />
               </div>
               <div className='relative mt-4 grid grid-cols-5 gap-1'>
                 <button
@@ -144,9 +181,9 @@ export default function ProductDetail() {
                     </div>
                   }
                   placement='bottom'
-                  // borderSpan={true}
                 >
-                  <CiCircleQuestion className='ml-2 h-5 w-5 fill-gray-500' />
+                  Info
+                  {/* <CiCircleQuestion className='ml-2 h-5 w-5 fill-gray-500' /> */}
                 </Popover>
               </div>
               <div className='mt-3 flex items-center bg-gray-50 py-4'>
