@@ -1,11 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
 import { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import path from 'src/constants/path'
 import authApi from 'src/apis/auth.api'
 import { AppContext } from 'src/contexts/app.context'
 import Popover from '../Popover'
+import useQueryConfig from 'src/hooks/useQueryConfig'
+import { useForm } from 'react-hook-form'
+import { schemaCommon, SchemaCommon } from 'src/utils/rules'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { omit } from 'lodash'
 
 interface ProductCartProps {
   name: string
@@ -39,9 +44,18 @@ const initialProductCart: ProductCartProps[] = [
     quantity: 1
   }
 ]
-
+type formData = Pick<SchemaCommon, 'name'>
+const nameSchema = schemaCommon.pick(['name'])
 export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
+  const queryConfig = useQueryConfig()
+  const navigate = useNavigate()
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      name: queryConfig.name || ''
+    },
+    resolver: yupResolver(nameSchema)
+  })
   const logoutMutation = useMutation({
     mutationFn: () => {
       return authApi.logoutAccount()
@@ -57,6 +71,26 @@ export default function Header() {
   const handleLogout = () => {
     logoutMutation.mutate()
   }
+
+  const onSubmitSearch = handleSubmit((data: formData) => {
+    console.log('data', data)
+    const config = queryConfig.order
+      ? omit(
+          {
+            ...queryConfig,
+            name: data.name
+          },
+          ['order', 'sort_by']
+        )
+      : {
+          ...queryConfig,
+          name: data.name
+        }
+    navigate({
+      pathname: path.home,
+      search: createSearchParams(config).toString()
+    })
+  })
 
   return (
     <div className='sticky top-0 z-20 bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white transition-[transform.2scubic-bezier(.4,0,.2,1)]'>
@@ -173,13 +207,13 @@ export default function Header() {
               </g>
             </svg>
           </Link>
-          <form className='col-span-9'>
+          <form className='col-span-9' onSubmit={onSubmitSearch}>
             <div className='flex h-[40px] rounded-none bg-white p-1'>
               <input
                 placeholder='Free Shipping on Orders Over $50'
                 type='text'
-                name='search'
                 className='h-[34px] flex-grow border-none bg-transparent p-2 text-black outline-none'
+                {...register('name')}
               />
               <button className='flex-shrink-0 rounded-sm bg-orange py-2 px-6 hover:opacity-90'>
                 <svg

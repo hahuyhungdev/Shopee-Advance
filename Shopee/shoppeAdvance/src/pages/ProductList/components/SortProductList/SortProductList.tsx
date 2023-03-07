@@ -5,7 +5,8 @@ import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 
 import path from 'src/constants/path'
 import omit from 'lodash/omit'
-import { QueryConfig } from '../../ProductList'
+import { QueryConfig } from 'src/hooks/useQueryConfig'
+
 interface Props {
   queryConfig: QueryConfig
   pageSize: number
@@ -36,28 +37,29 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
     })
   }
 
-  // const handlePriceOrder = (orderValue: Exclude<ProductListConfig['order'], undefined>) => {
-  //   navigate({
-  //     pathname: path.home,
-  //     search: createSearchParams({
-  //       ...queryConfig,
-  //       sort_by: sortBy.price,
-  //       order: orderValue
-  //     }).toString()
-  //   })
-  // }
-
-  // use currying to handlePriceOrder
-  const handlePriceOrder = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handlePriceOrder = (orderValue: Exclude<ProductListConfig['order'], undefined>) => {
     navigate({
       pathname: path.home,
       search: createSearchParams({
         ...queryConfig,
         sort_by: sortBy.price,
-        order: event.target.value as Exclude<ProductListConfig['order'], undefined>
+        order: orderValue
       }).toString()
     })
   }
+
+  // use currying to handlePriceOrder
+  // but i think look like more complex and hard to understand
+  // const handlePriceOrder = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   navigate({
+  //     pathname: path.home,
+  //     search: createSearchParams({
+  //       ...queryConfig,
+  //       sort_by: sortBy.price,
+  //       order: event.target.value as Exclude<ProductListConfig['order'], undefined>
+  //     }).toString()
+  //   })
+  // }
 
   return (
     <div className='bg-gray-300/40 py-4 px-3'>
@@ -97,7 +99,7 @@ export default function SortProductList({ queryConfig, pageSize }: Props) {
               'bg-white text-black hover:bg-slate-100': !isActiveSortBy(sortBy.price)
             })}
             value={order || ''}
-            onChange={handlePriceOrder}
+            onChange={(event) => handlePriceOrder(event.target.value as Exclude<ProductListConfig['order'], undefined>)}
           >
             <option value='' disabled className='bg-white text-black'>
               Giá
