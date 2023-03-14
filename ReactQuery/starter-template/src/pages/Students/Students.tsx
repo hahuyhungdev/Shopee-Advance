@@ -35,6 +35,10 @@ export default function Students() {
     onSuccess: (_, id) => {
       // refetch data
       // exact: true để xác định queryKey cụ thể
+      /*
+      This means that if you have multiple queries related to the students resource, only the query with the exact ['students', page] key will be removed from the cache (with exact: true )
+       If exact were set to false, all queries with keys that partially match ['students', page] would be removed from the cache.
+      */
       queryClient.invalidateQueries({ queryKey: ['students', page], exact: true })
       toast.success(`Delete student ${id} successfully`)
     }
