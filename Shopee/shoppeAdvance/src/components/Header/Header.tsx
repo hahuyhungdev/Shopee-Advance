@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -22,6 +22,7 @@ const nameSchema = schemaCommon.pick(['name'])
 const MAX_PURCHASES = 5
 export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
+  const queryClient = useQueryClient()
   const queryConfig = useQueryConfig()
   const navigate = useNavigate()
   const { register, handleSubmit } = useForm({
@@ -38,6 +39,9 @@ export default function Header() {
       setIsAuthenticated(false)
       setProfile(null)
       toast.success('Logout success')
+      // case : when logout then remove all queries. if not, although logout but still have data in cache at the Cart
+      // The removeQueries method can be used to remove queries from the cache based on their query keys or any other functionally accessible property/state of the query.
+      queryClient.removeQueries(['purchases', { status: purchasesStatus.inCart }])
     }
   })
 
@@ -47,7 +51,9 @@ export default function Header() {
   // should queries not have inactive => not call again > unecessary set stale: infinity
   const { data: purchasesInCartData } = useQuery({
     queryKey: ['purchases', { status: purchasesStatus.inCart }],
-    queryFn: () => purchaseApi.getPurchases({ status: purchasesStatus.inCart })
+    queryFn: () => purchaseApi.getPurchases({ status: purchasesStatus.inCart }),
+    // explain : here, we don't want to call api when user is not authenticated
+    enabled: isAuthenticated
   })
   const purchasesInCart = purchasesInCartData?.data?.data
 
@@ -266,7 +272,7 @@ export default function Header() {
                 </div>
               }
             >
-              <Link to='/' className='relative'>
+              <Link to={path.cart} className='relative'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   fill='none'
