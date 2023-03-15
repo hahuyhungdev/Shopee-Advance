@@ -1,5 +1,6 @@
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import 'antd/dist/reset.css'
 import useRouteElements from './hooks/useRouteElements'
 
 function App() {

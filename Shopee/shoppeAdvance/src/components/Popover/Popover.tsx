@@ -2,6 +2,7 @@ import React, { useRef, useId, ElementType } from 'react'
 
 import { arrow, FloatingPortal, offset, shift, useFloating, type Placement } from '@floating-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
+import clsx from 'clsx'
 
 interface Props {
   children: React.ReactNode
@@ -55,7 +56,9 @@ export default function Popover({
               }}
             >
               <span
-                className='absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent border-b-white'
+                className={clsx(
+                  'absolute z-50 translate-y-[-95%] border-[11px] border-x-transparent border-t-transparent'
+                )}
                 ref={arrowRef}
                 style={{
                   left: middlewareData.arrow?.x,

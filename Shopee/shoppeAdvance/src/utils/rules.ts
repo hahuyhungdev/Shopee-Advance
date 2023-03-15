@@ -109,6 +109,10 @@ export const schema = yup.object({
     test: testPriceMinMax
   })
 })
+export const schemaCommon = yup.object({
+  name: yup.string().trim().required('Name does not exist')
+})
+export type SchemaCommon = yup.InferType<typeof schemaCommon>
 export type Schema = yup.InferType<typeof schema>
 // example if want to use yup with schema fields
 // export const loginSchema = schema.omit(['confirm_password'])

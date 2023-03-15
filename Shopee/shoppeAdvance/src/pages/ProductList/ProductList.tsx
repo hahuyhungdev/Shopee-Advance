@@ -1,46 +1,29 @@
 import { useQuery } from '@tanstack/react-query'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { omitBy, isUndefined } from 'lodash'
 import productApi from 'src/apis/product.api'
-import Pagination from 'src/components/Pagination'
-import useQueryParam from 'src/hooks/useQueryParam'
+
 import { ProductListConfig } from 'src/types/product.type'
 import AsideFilter from './components/AsideFilter'
 import Product from './components/Product/Product'
 import SortProductList from './components/SortProductList'
 import categoryApi from 'src/apis/categoriest'
+import Page from 'src/components/PaginationAnt'
+import { Pagination as PaginationAnt } from 'antd'
+import Pagination from 'src/components/Pagination'
+import useQueryConfig from 'src/hooks/useQueryConfig'
 
-export type QueryConfig = {
-  [key in keyof ProductListConfig]: string
-}
 export default function ProductList() {
-  const queryParam: QueryConfig = useQueryParam()
-
-  // Explain: hear, we use lodash to omit undefined value in queryParam.
-  //Because we don't want to send undefined value to server
-  const queryConfig: QueryConfig = omitBy(
-    {
-      page: queryParam.page || '1',
-      limit: queryParam.limit,
-      sort_by: queryParam.sort_by,
-      order: queryParam.order,
-      exclude: queryParam.exclude,
-      rating_filter: queryParam.rating_filter,
-      price_max: queryParam.price_max,
-      price_min: queryParam.price_min,
-      name: queryParam.name,
-      category: queryParam.category
-    },
-    isUndefined
-  )
+  const queryConfig = useQueryConfig()
+  // console.log('queryParam', queryParam)
   // Product list use query to get data from server
   const { data: productsData } = useQuery({
     queryKey: ['products', queryConfig],
     queryFn: () => {
       return productApi.getProducts(queryConfig as ProductListConfig)
     },
-    // keep previous data when refetching not laq when click or change page
-    keepPreviousData: true
+    keepPreviousData: true,
+    staleTime: 3 * 60 * 1000
   })
 
   // Product list use query to get data from server
@@ -50,6 +33,8 @@ export default function ProductList() {
       return categoryApi.getCategories()
     }
   })
+
+  console.log(productsData?.data.data)
   return (
     <div className='bg-gray-200 py-6'>
       <div className='container'>
