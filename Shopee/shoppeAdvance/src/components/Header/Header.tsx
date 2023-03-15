@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -11,6 +11,9 @@ import { useForm } from 'react-hook-form'
 import { schemaCommon, SchemaCommon } from 'src/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { omit } from 'lodash'
+import { purchasesStatus } from 'src/constants/purchase'
+import purchaseApi from 'src/apis/purchase.api'
+import { formatCurrency } from 'src/utils/utils'
 
 interface ProductCartProps {
   name: string
@@ -18,34 +21,11 @@ interface ProductCartProps {
   image: string
   quantity: number
 }
-const initialProductCart: ProductCartProps[] = [
-  {
-    name: 'Túi Chống Sốc Laptop 13 inch 14 inch 15 inch HARAS TCP001 inch 15 inch HARAS TCP001',
-    price: 100,
-    image: 'https://cf.shopee.vn/file/sg-11134201-22100-fx3iht2sz0ivcc_tn',
-    quantity: 1
-  },
-  {
-    name: 'Áo sweater dày dặn AMBUSII, áo nỉ bông nam nữ',
-    price: 200,
-    image: 'https://cf.shopee.vn/file/sg-11134201-23020-7sxd4inr23mv49_tn',
-    quantity: 1
-  },
-  {
-    name: 'Áo sơ mi nam cổ tròn, áo sơ mi nam cổ tròn',
-    price: 300,
-    image: 'https://picsum.photos/200/300',
-    quantity: 1
-  },
-  {
-    name: 'Macbook Pro 2020 13 inch M1 8GB 256GB',
-    price: 400,
-    image: 'https://cf.shopee.vn/file/3dc295d6cf179db2dab61359a6969e8b_tn',
-    quantity: 1
-  }
-]
+
 type formData = Pick<SchemaCommon, 'name'>
 const nameSchema = schemaCommon.pick(['name'])
+
+const MAX_PURCHASES = 5
 export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
   const queryConfig = useQueryConfig()
@@ -66,6 +46,16 @@ export default function Header() {
       toast.success('Logout success')
     }
   })
+
+  // when us direct then header just re-render
+  // not unmount - mount again
+  // except of course case logout then jump to RegisterLayout comback in case
+  // should queries not have inactive => not call again > unecessary set stale: infinity
+  const { data: purchasesInCartData } = useQuery({
+    queryKey: ['purchases', { status: purchasesStatus.inCart }],
+    queryFn: () => purchaseApi.getPurchases({ status: purchasesStatus.inCart })
+  })
+  const purchasesInCart = purchasesInCartData?.data?.data
 
   // handle logout mutate
   const handleLogout = () => {
@@ -238,38 +228,44 @@ export default function Header() {
               placement='bottom-end'
               renderPopover={
                 <div className='relative z-30 max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
-                  <div className='p-2'>
-                    <div className='capitalize text-gray-400'>Recenty Added Products</div>
-                    <div className='mt-5'>
-                      {initialProductCart.map((item) => (
-                        <div
-                          key={item.name}
-                          className='flex cursor-pointer justify-between gap-3 py-2 px-3 hover:bg-gray-50'
-                        >
-                          <img src={item.image} alt='anh' className='h-10 w-10 object-cover' />
-                          <div className='flex-grow gap-3 overflow-hidden'>
-                            <div className='truncate'>{item.name}</div>
+                  {purchasesInCart && purchasesInCart.length > 0 ? (
+                    <div className='p-2'>
+                      <div className='capitalize text-gray-400'>Recenty Added Products</div>
+                      <div className='mt-5'>
+                        {purchasesInCart.slice(0, MAX_PURCHASES).map((purchase) => (
+                          <div
+                            key={purchase._id}
+                            className='flex cursor-pointer justify-between gap-3 py-2 px-3 hover:bg-gray-50'
+                          >
+                            <img src={purchase.product.image} alt='anh' className='h-10 w-10 object-cover' />
+                            <div className='flex-grow gap-3 overflow-hidden'>
+                              <div className='truncate'>{purchase.product.name}</div>
+                            </div>
+                            <div className='flex-shrink text-orange'>
+                              <span>đ</span>
+                              <span>{formatCurrency(purchase.product.price)}</span>
+                            </div>
                           </div>
-                          <div className='flex-shrink text-orange'>
-                            <span>đ</span>
-                            <span>{item.price}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className='mt-5 mb-2 flex items-center justify-between px-3'>
-                      <div className='flex gap-1 text-xs capitalize'>
-                        <span className='text-left'>1</span>
-                        <span className='text-left'>More Products in Cart</span>
+                        ))}
                       </div>
-                      <Link
-                        to='/cart'
-                        className='rounded-sm bg-orange py-2 px-3 capitalize text-white hover:bg-opacity-[0.9]'
-                      >
-                        View My Shopping Cart
-                      </Link>
+                      <div className='mt-5 mb-2 flex items-center justify-between px-3'>
+                        <div className='flex gap-1 text-xs capitalize'>
+                          <span className='text-left'>1</span>
+                          <span className='text-left'>More Products in Cart</span>
+                        </div>
+                        <Link
+                          to='/cart'
+                          className='rounded-sm bg-orange py-2 px-3 capitalize text-white hover:bg-opacity-[0.9]'
+                        >
+                          View My Shopping Cart
+                        </Link>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className='h-[300px] w-[300px]'>
+                      <p className='mx-auto my-auto'>No products in cart</p>
+                    </div>
+                  )}
                 </div>
               }
             >
