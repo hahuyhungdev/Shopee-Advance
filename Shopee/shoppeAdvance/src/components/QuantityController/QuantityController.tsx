@@ -20,27 +20,31 @@ function QuantityController({
   classNameWrapper = 'ml-10',
   ...rest
 }: Props) {
+  const [localValue, setLocalValue] = React.useState<number>(Number(value) || 1)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // here, i want to convert event. target. value to number should i used Number()
-    let _value = Number(event.target.value)
+    let _value = Number(event.target.value || localValue)
     if (max !== undefined && Number(_value) > max) {
       _value = max
     }
     onType && onType(_value)
+    setLocalValue(_value)
   }
   const increase = () => {
-    let _value = Number(value) + 1
+    let _value = Number(value || localValue) + 1
     if (max !== undefined && Number(_value) > max) {
       _value = max
     }
     onIncrease && onIncrease(_value)
+    setLocalValue(_value)
   }
   const decrease = () => {
-    let _value = Number(value) - 1
+    let _value = Number(value || localValue) - 1
     if (_value < 1) {
       _value = 1
     }
     onDecrease && onDecrease(_value)
+    setLocalValue(_value)
   }
   return (
     <div className={`flex  items-center ${classNameWrapper}`}>
@@ -62,7 +66,7 @@ function QuantityController({
       </button>
       <InputNumber
         onChange={handleChange}
-        value={value}
+        value={value || localValue}
         classNameError='hidden'
         classNameInput='h-8 w-14 border-t border-b border-gray-300 p-1 text-center outline-none'
         {...rest}

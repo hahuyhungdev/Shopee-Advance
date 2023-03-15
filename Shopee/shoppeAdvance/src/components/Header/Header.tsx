@@ -13,14 +13,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { omit } from 'lodash'
 import { purchasesStatus } from 'src/constants/purchase'
 import purchaseApi from 'src/apis/purchase.api'
+import noproduct from 'src/assets/images/no-product.png'
 import { formatCurrency } from 'src/utils/utils'
-
-interface ProductCartProps {
-  name: string
-  price: number
-  image: string
-  quantity: number
-}
 
 type formData = Pick<SchemaCommon, 'name'>
 const nameSchema = schemaCommon.pick(['name'])
@@ -227,49 +221,52 @@ export default function Header() {
             <Popover
               placement='bottom-end'
               renderPopover={
-                <div className='relative z-30 max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
+                <div className='relative  max-w-[400px] rounded-sm border border-gray-200 bg-white text-sm shadow-md'>
                   {purchasesInCart && purchasesInCart.length > 0 ? (
                     <div className='p-2'>
-                      <div className='capitalize text-gray-400'>Recenty Added Products</div>
+                      <div className='capitalize text-gray-400'>Sản phẩm mới thêm</div>
                       <div className='mt-5'>
                         {purchasesInCart.slice(0, MAX_PURCHASES).map((purchase) => (
-                          <div
-                            key={purchase._id}
-                            className='flex cursor-pointer justify-between gap-3 py-2 px-3 hover:bg-gray-50'
-                          >
-                            <img src={purchase.product.image} alt='anh' className='h-10 w-10 object-cover' />
-                            <div className='flex-grow gap-3 overflow-hidden'>
+                          <div className='mt-2 flex py-2 hover:bg-gray-100' key={purchase._id}>
+                            <div className='flex-shrink-0'>
+                              <img
+                                src={purchase.product.image}
+                                alt={purchase.product.name}
+                                className='h-11 w-11 object-cover'
+                              />
+                            </div>
+                            <div className='ml-2 flex-grow overflow-hidden'>
                               <div className='truncate'>{purchase.product.name}</div>
                             </div>
-                            <div className='flex-shrink text-orange'>
-                              <span>đ</span>
-                              <span>{formatCurrency(purchase.product.price)}</span>
+                            <div className='ml-2 flex-shrink-0'>
+                              <span className='text-orange'>₫{formatCurrency(purchase.product.price)}</span>
                             </div>
                           </div>
                         ))}
                       </div>
-                      <div className='mt-5 mb-2 flex items-center justify-between px-3'>
-                        <div className='flex gap-1 text-xs capitalize'>
-                          <span className='text-left'>1</span>
-                          <span className='text-left'>More Products in Cart</span>
+                      <div className='mt-6 flex items-center justify-between'>
+                        <div className='text-xs capitalize text-gray-500'>
+                          {purchasesInCart.length > MAX_PURCHASES ? purchasesInCart.length - MAX_PURCHASES : ''} Thêm
+                          hàng vào giỏ
                         </div>
                         <Link
-                          to='/cart'
-                          className='rounded-sm bg-orange py-2 px-3 capitalize text-white hover:bg-opacity-[0.9]'
+                          to={path.cart}
+                          className='rounded-sm bg-orange px-4 py-2 capitalize text-white hover:bg-opacity-90'
                         >
-                          View My Shopping Cart
+                          Xem giỏ hàng
                         </Link>
                       </div>
                     </div>
                   ) : (
-                    <div className='h-[300px] w-[300px]'>
-                      <p className='mx-auto my-auto'>No products in cart</p>
+                    <div className='flex h-[300px] w-[300px] flex-col items-center justify-center p-2'>
+                      <img src={noproduct} alt='no purchase' className='h-24 w-24' />
+                      <div className='mt-3 capitalize'>Chưa có sản phẩm</div>
                     </div>
                   )}
                 </div>
               }
             >
-              <Link to='/cart'>
+              <Link to='/' className='relative'>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   fill='none'
@@ -284,6 +281,11 @@ export default function Header() {
                     d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z'
                   />
                 </svg>
+                {purchasesInCart && purchasesInCart.length > 0 && (
+                  <span className='absolute top-[-5px] right-[-10px] rounded-full bg-white px-[9px] py-[1px] text-xs text-orange '>
+                    {purchasesInCart?.length}
+                  </span>
+                )}
               </Link>
             </Popover>
           </div>
