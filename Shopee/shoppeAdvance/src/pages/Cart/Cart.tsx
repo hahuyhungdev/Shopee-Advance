@@ -125,6 +125,7 @@ export default function Cart() {
 
   const handleDelete = (purchaseIndex: number) => () => {
     const purchaseId = extendedPurchases[purchaseIndex]._id
+
     deletePurchasesMutation.mutate([purchaseId])
   }
 
@@ -193,7 +194,7 @@ export default function Cart() {
                             <div className='flex-grow'>
                               <div className='flex'>
                                 <Link
-                                  className='h-20 w-20 flex-shrink-0'
+                                  className='h-20 w-20 flex-shrink-0 '
                                   to={`${path.home}${generateNameId({
                                     name: purchase.product.name,
                                     id: purchase.product._id
@@ -231,7 +232,10 @@ export default function Cart() {
                                 max={purchase.product.quantity}
                                 value={purchase.buy_count}
                                 classNameWrapper='flex items-center'
-                                onIncrease={(value) => handleQuantity(index, value, value <= purchase.product.quantity)}
+                                onIncrease={(value) => {
+                                  console.log(value, purchase.product.quantity)
+                                  handleQuantity(index, value, value <= purchase.product.quantity)
+                                }}
                                 onDecrease={(value) => handleQuantity(index, value, value >= 1)}
                                 onType={handleTypeQuantity(index)}
                                 onFocusOut={(value) =>

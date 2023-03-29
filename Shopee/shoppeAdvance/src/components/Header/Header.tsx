@@ -1,36 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
-import { createSearchParams, Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import path from 'src/constants/path'
 import authApi from 'src/apis/auth.api'
-import { AppContext } from 'src/contexts/app.context'
-import Popover from '../Popover'
-import useQueryConfig from 'src/hooks/useQueryConfig'
-import { useForm } from 'react-hook-form'
-import { schemaCommon, SchemaCommon } from 'src/utils/rules'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { omit } from 'lodash'
-import { purchasesStatus } from 'src/constants/purchase'
 import purchaseApi from 'src/apis/purchase.api'
 import noproduct from 'src/assets/images/no-product.png'
+import path from 'src/constants/path'
+import { purchasesStatus } from 'src/constants/purchase'
+import { AppContext } from 'src/contexts/app.context'
+import useSearchProduct from 'src/hooks/useSearchProduct'
 import { formatCurrency } from 'src/utils/utils'
-
-type formData = Pick<SchemaCommon, 'name'>
-const nameSchema = schemaCommon.pick(['name'])
+import Popover from '../Popover'
 
 const MAX_PURCHASES = 5
 export default function Header() {
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
+  const { register, onSubmitSearch } = useSearchProduct()
   const queryClient = useQueryClient()
-  const queryConfig = useQueryConfig()
-  const navigate = useNavigate()
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      name: queryConfig.name || ''
-    },
-    resolver: yupResolver(nameSchema)
-  })
+
   const logoutMutation = useMutation({
     mutationFn: () => {
       return authApi.logoutAccount()
@@ -62,30 +49,10 @@ export default function Header() {
     logoutMutation.mutate()
   }
 
-  const onSubmitSearch = handleSubmit((data: formData) => {
-    console.log('data', data)
-    const config = queryConfig.order
-      ? omit(
-          {
-            ...queryConfig,
-            name: data.name
-          },
-          ['order', 'sort_by']
-        )
-      : {
-          ...queryConfig,
-          name: data.name
-        }
-    navigate({
-      pathname: path.home,
-      search: createSearchParams(config).toString()
-    })
-  })
-
   return (
     <div className='sticky top-0 z-20 bg-[linear-gradient(-180deg,#f53d2d,#f63)] pb-5 pt-2 text-white transition-[transform.2scubic-bezier(.4,0,.2,1)]'>
       <div className='container'>
-        <div className='flex justify-between'>
+        <div className='flex items-center justify-between'>
           <div className='flex justify-start gap-x-3'>
             <p>Seller Cente</p>
             <p>Download</p>
