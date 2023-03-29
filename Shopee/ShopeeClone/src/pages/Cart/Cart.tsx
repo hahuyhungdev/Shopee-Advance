@@ -231,7 +231,7 @@ export default function Cart() {
                                 value={purchase.buy_count}
                                 classNameWrapper='flex items-center'
                                 onIncrease={(value) => handleQuantity(index, value, value <= purchase.product.quantity)}
-                                onDecrease={(value) => handleQuantity(index, value, value >= 1)}
+                                onDecrease={(value) => handleQuantity(index, value, value > 1)}
                                 onType={handleTypeQuantity(index)}
                                 onFocusOut={(value) =>
                                   handleQuantity(

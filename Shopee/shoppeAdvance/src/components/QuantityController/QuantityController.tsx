@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import React from 'react'
 import InputNumber from '../InputNumber'
 import { InputNumberProps } from '../InputNumber/InputNumber'
@@ -52,12 +53,17 @@ function QuantityController({
   const handleBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
     onFocusOut && onFocusOut(Number(event.target.value))
   }
+  const isDisabledUp = max !== undefined && Number(value || localValue) == max
+  const isDisabledDown = Number(value || localValue) <= 1
+
   return (
     <div className={`flex  items-center ${classNameWrapper}`}>
       <button
         onClick={decrease}
-        className='flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600
-      '
+        disabled={isDisabledDown}
+        className={clsx('flex h-8 w-8 items-center justify-center rounded-l-sm border border-gray-300 text-gray-600', {
+          'cursor-not-allowed bg-gray-100': isDisabledDown
+        })}
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
@@ -80,7 +86,10 @@ function QuantityController({
       />
       <button
         onClick={increase}
-        className='flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600'
+        disabled={isDisabledUp}
+        className={clsx('flex h-8 w-8 items-center justify-center rounded-r-sm border border-gray-300 text-gray-600', {
+          'cursor-not-allowed bg-gray-200': isDisabledUp
+        })}
       >
         <svg
           xmlns='http://www.w3.org/2000/svg'
