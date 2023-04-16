@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { omitBy, isUndefined } from 'lodash'
 import productApi from 'src/apis/product.api'
 
-import { ProductListConfig } from 'src/types/product.type'
+import { Product as ProductType, ProductListConfig } from 'src/types/product.type'
 import AsideFilter from './components/AsideFilter'
 import Product from './components/Product/Product'
 import SortProductList from './components/SortProductList'
@@ -47,7 +47,7 @@ export default function ProductList() {
             <div className='sticky z-10 col-span-9'>
               <SortProductList queryConfig={queryConfig} pageSize={productsData.data.data.pagination.page_size} />
               <div className='mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
-                {productsData.data.data.products.map((product) => (
+                {productsData.data.data.products.map((product: ProductType) => (
                   <div className='col-span-1' key={product._id}>
                     <Product product={product} />
                   </div>
