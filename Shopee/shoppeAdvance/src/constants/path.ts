@@ -1,12 +1,13 @@
 const path = {
   home: '/',
+  user: '/user',
+  profile: '/user/profile',
+  changePassword: '/user/password',
+  historyPurchase: '/user/purchase',
   login: '/login',
   register: '/register',
-  profile: '/profile',
   logout: '/logout',
-  products: '/products',
-  categories: '/categories',
-  productDetail: ':productId',
+  productDetail: ':nameId',
   cart: '/cart'
 } as const
 

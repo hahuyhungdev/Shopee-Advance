@@ -1,5 +1,6 @@
 import React from 'react'
 import type { RegisterOptions, UseFormRegister } from 'react-hook-form'
+import clsx from 'clsx'
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   errorMessage?: string
@@ -12,7 +13,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function Input({
   errorMessage,
   className,
-  classNameInput = 'w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm',
+  classNameInput,
   name,
   rules,
   classNameError = 'mt-1 min-h-[1.25rem] text-sm text-red-600',
@@ -22,7 +23,14 @@ export default function Input({
   const registerResult = register && name ? register(name, rules) : {}
   return (
     <div className={className}>
-      <input className={classNameInput} {...rest} {...registerResult} />
+      <input
+        className={clsx(
+          'w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm',
+          classNameInput
+        )}
+        {...rest}
+        {...registerResult}
+      />
       <div className={classNameError}>{errorMessage}</div>
     </div>
   )
