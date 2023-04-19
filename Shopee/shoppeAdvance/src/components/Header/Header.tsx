@@ -9,7 +9,7 @@ import path from 'src/constants/path'
 import { purchasesStatus } from 'src/constants/purchase'
 import { AppContext } from 'src/contexts/app.context'
 import useSearchProduct from 'src/hooks/useSearchProduct'
-import { formatCurrency } from 'src/utils/utils'
+import { formatCurrency, getAvatarUrl } from 'src/utils/utils'
 import Popover from '../Popover'
 
 const MAX_PURCHASES = 5
@@ -135,7 +135,7 @@ export default function Header() {
               >
                 <div className='mr-2 h-5 w-5 flex-shrink-0'>
                   <img
-                    src='https://cf.shopee.vn/file/3338b44837eeaa51d47863a1bf236286_tn'
+                    src={getAvatarUrl(profile?.avatar)}
                     alt='avatar'
                     className='h-full w-full rounded-full object-cover'
                   />

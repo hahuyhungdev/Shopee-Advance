@@ -34,7 +34,6 @@ class Http {
     // Add a response interceptor
     this.instance.interceptors.response.use(
       (response) => {
-        console.log('response', response)
         const { url } = response.config
 
         if (url?.includes(URL_LOGIN) || url?.includes(URL_REGISTER)) {

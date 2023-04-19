@@ -1,11 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Fragment, useContext, useEffect, useMemo, useState } from 'react'
+import { Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, Controller, FormProvider, useFormContext } from 'react-hook-form'
 import { toast } from 'react-toastify'
 
 import Button from 'src/components/Button'
 import Input from 'src/components/Input'
+import config from 'src/constants/config'
 
 import InputNumber from 'src/components/InputNumber'
 import { AppContext } from 'src/contexts/app.context'
@@ -15,7 +16,7 @@ import { setProfileToLS } from 'src/utils/auth'
 import DateSelect from '../../components/DateSelect'
 import { UserSchema, userSchema } from 'src/utils/rules'
 import userApi from 'src/apis/user.api'
-import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
+import { getAvatarUrl, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import InputFile from 'src/components/InputFile'
 
 function Info() {
@@ -55,6 +56,7 @@ function Info() {
 }
 
 type FormData = Pick<UserSchema, 'name' | 'address' | 'phone' | 'date_of_birth' | 'avatar'>
+// note: because type of date_of_birth is Date, so we need to convert it to string
 type FormDataError = Omit<FormData, 'date_of_birth'> & {
   date_of_birth?: string
 }
@@ -72,6 +74,7 @@ export default function Profile() {
   const { setProfile } = useContext(AppContext)
   const [file, setFile] = useState<File>()
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const previewImage = useMemo(() => {
     return file ? URL.createObjectURL(file) : ''
   }, [file])
@@ -81,6 +84,7 @@ export default function Profile() {
     queryFn: userApi.getProfile
   })
   const profile = profileData?.data.data
+
   const updateProfileMutation = useMutation(userApi.updateProfile)
   const uploadAvatarMutaion = useMutation(userApi.uploadAvatar)
   const methods = useForm<FormData>({
@@ -114,7 +118,6 @@ export default function Profile() {
       setValue('date_of_birth', profile.date_of_birth ? new Date(profile.date_of_birth) : new Date(1990, 0, 1))
     }
   }, [profile, setValue])
-
   const onSubmit = handleSubmit(async (data) => {
     try {
       let avatarName = avatar
@@ -135,22 +138,26 @@ export default function Profile() {
       refetch()
       toast.success(res.data.message)
     } catch (error) {
+      console.log(error)
       if (isAxiosUnprocessableEntityError<ErrorResponse<FormDataError>>(error)) {
         const formError = error.response?.data.data
         if (formError) {
           Object.keys(formError).forEach((key) => {
-            setError(key as keyof FormDataError, {
-              message: formError[key as keyof FormDataError],
-              type: 'Server'
-            })
+            setError(key as keyof FormData, { message: formError[key as keyof FormData], type: 'Server' })
           })
         }
       }
     }
   })
+  const handleUpload = () => {
+    fileInputRef.current?.click()
+  }
 
-  const handleChangeFile = (file?: File) => {
-    setFile(file)
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileFromLocal = event.target.files?.[0]
+    if (fileFromLocal) {
+      setFile(fileFromLocal)
+    }
   }
 
   return (
@@ -188,7 +195,7 @@ export default function Profile() {
                 <DateSelect
                   errorMessage={errors.date_of_birth?.message}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(date) => field.onChange(date)}
                 />
               )}
             />
@@ -207,9 +214,29 @@ export default function Profile() {
           <div className='flex justify-center md:w-72 md:border-l md:border-l-gray-200'>
             <div className='flex flex-col items-center'>
               <div className='my-5 h-24 w-24'>
-                <img src={previewImage} alt='' className='h-full w-full rounded-full object-cover' />
+                <img
+                  src={file ? previewImage : getAvatarUrl(avatar)}
+                  alt='avatar'
+                  className='h-full w-full rounded-full object-cover'
+                />
               </div>
-              <InputFile onChange={handleChangeFile} />
+              {/* <InputFile onChange={handleChangeFile} /> */}
+              <>
+                <input
+                  accept=' .jpg, .jpeg, .png'
+                  type='file'
+                  className='hidden'
+                  ref={fileInputRef}
+                  onChange={onFileChange}
+                />
+                <button
+                  className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
+                  type='button'
+                  onClick={handleUpload}
+                >
+                  Chọn ảnh
+                </button>
+              </>
               <div className='mt-3 text-gray-400'>
                 <div>Dụng lượng file tối đa 1 MB</div>
                 <div>Định dạng:.JPEG, .PNG</div>

@@ -25,6 +25,7 @@ export default function DateSelect({ value, onChange, errorMessage }: Props) {
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { value: valueFromSelect, name } = event.target
+
     const newDate = {
       date: value?.getDate() || date.date,
       month: value?.getMonth() || date.month,
@@ -32,6 +33,7 @@ export default function DateSelect({ value, onChange, errorMessage }: Props) {
       [name]: Number(valueFromSelect)
     }
     setDate(newDate)
+
     onChange && onChange(new Date(newDate.year, newDate.month, newDate.date))
   }
 
