@@ -63,7 +63,6 @@ export default function ChangePassword() {
             <div className='sm:w-[80%] sm:pl-5'>
               <Input
                 classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
-                className='relative '
                 register={register}
                 name='password'
                 type='password'
@@ -77,7 +76,6 @@ export default function ChangePassword() {
             <div className='sm:w-[80%] sm:pl-5'>
               <Input
                 classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
-                className='relative '
                 register={register}
                 name='new_password'
                 type='password'
@@ -91,7 +89,6 @@ export default function ChangePassword() {
             <div className='sm:w-[80%] sm:pl-5'>
               <Input
                 classNameInput='w-full rounded-sm border border-gray-300 px-3 py-2 outline-none focus:border-gray-500 focus:shadow-sm'
-                className='relative '
                 register={register}
                 name='confirm_password'
                 type='password'

@@ -1,4 +1,4 @@
-import { Purchase, PurchaseListStatus } from 'src/types/purcharse.type'
+import { Purchase, PurchaseListStatus } from 'src/types/purchase.type'
 import { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
 

@@ -13,7 +13,7 @@ import keyBy from 'lodash/keyBy'
 import { toast } from 'react-toastify'
 import { AppContext } from 'src/contexts/app.context'
 import noproduct from 'src/assets/images/no-product.png'
-import { Purchase } from 'src/types/purcharse.type'
+import { Purchase } from 'src/types/purchase.type'
 
 export default function Cart() {
   const { extendedPurchases, setExtendedPurchases } = useContext(AppContext)

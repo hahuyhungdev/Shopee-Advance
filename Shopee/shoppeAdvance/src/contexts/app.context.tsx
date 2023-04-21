@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react'
-import { ExtendedPurchase } from 'src/types/purcharse.type'
+import { ExtendedPurchase } from 'src/types/purchase.type'
 import { User } from 'src/types/user.type'
 import { getAccessTokenFromLS, getProfileFromLS } from 'src/utils/auth'
 

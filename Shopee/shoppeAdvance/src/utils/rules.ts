@@ -85,11 +85,11 @@ export const schema = yup.object({
     .max(160, 'Email must have at most 160 characters'),
   password: yup
     .string()
+    .required('Password does not exist')
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
     )
-    .required('Password does not exist')
     .min(6, 'Password must have at least 6 characters')
     .max(20, 'Password must have at most 20 characters'),
   confirm_password: yup
@@ -131,8 +131,8 @@ export const userSchema = yup.object({
   address: yup.string().max(160, 'Độ dài tối đa là 160 ký tự'),
   avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự'),
   date_of_birth: yup.date().max(new Date(), 'Hãy chọn một ngày trong quá khứ'),
-  password: schema.fields['password'],
-  new_password: schema.fields['password'],
+  password: schema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
+  new_password: schema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
   confirm_password: handleConfirmPasswordYup('new_password')
 })
 
