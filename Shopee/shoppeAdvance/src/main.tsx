@@ -7,6 +7,8 @@ import App from './App'
 import { AppProvider } from './contexts/app.context'
 
 import './index.css'
+import ErrorBoundary from './components/ErrorBoundary'
+import { HelmetProvider } from 'react-helmet-async'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -18,9 +20,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <App />
-        </AppProvider>
+        <HelmetProvider>
+          <AppProvider>
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
+          </AppProvider>
+        </HelmetProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </BrowserRouter>
