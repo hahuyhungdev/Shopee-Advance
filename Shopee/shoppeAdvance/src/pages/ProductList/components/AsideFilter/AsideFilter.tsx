@@ -15,6 +15,7 @@ import { NoUndefinedField } from 'src/types/utils.type'
 import RatingStars from '../RatingStars/RatingStarts'
 import omit from 'lodash/omit'
 import { QueryConfig } from 'src/hooks/useQueryConfig'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   queryConfig: QueryConfig
@@ -43,6 +44,7 @@ type FormData = NoUndefinedField<Pick<QueryConfig, 'price_min' | 'price_max'>>
  */
 const priceSchema = schema.pick(['price_min', 'price_max'])
 export default function AsideFilter({ categories, queryConfig }: Props) {
+  const { t } = useTranslation('home')
   const { category } = queryConfig
   const {
     control,
@@ -90,7 +92,7 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
     <div className='sticky top-[8rem] rounded-sm border-2 py-4'>
       <Link to={path.home} className=' flex items-center font-bold'>
         <TfiMenuAlt className='mr-3 h-4 w-3 fill-current' />
-        <span>All Products</span>
+        {t('aside filter.all categories')}
       </Link>
       <div className='mt-4 mb-2 h-[1px] bg-gray-300' />
       <ul className='pl-2'>
@@ -125,7 +127,7 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
       </ul>
       <Link to={path.home} className='mt-4 flex items-center font-bold'>
         <CiFilter className='mr-3 h-4 w-3 fill-current' />
-        <span>Filter</span>
+        {t('aside filter.filter search')}
       </Link>
       <div className='mt-4 mb-2 h-[1px] bg-gray-300' />
       <div className='my-4'>
