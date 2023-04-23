@@ -13,9 +13,7 @@ function NavHeader() {
   console.log('isAuthenticated', isAuthenticated)
   const queryClient = useQueryClient()
   const logoutMutation = useMutation({
-    mutationFn: () => {
-      return authApi.logoutAccount()
-    },
+    mutationFn: () => authApi.logoutAccount(),
     onSuccess: () => {
       setIsAuthenticated(false)
       setProfile(null)
@@ -100,7 +98,10 @@ function NavHeader() {
                 <Link to={path.profile} className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
                   My Account
                 </Link>
-                <Link to='' className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'>
+                <Link
+                  to={path.historyPurchase}
+                  className='block w-full bg-white py-3 px-4 text-left hover:text-cyan-500'
+                >
                   My Purchase
                 </Link>
                 <button
