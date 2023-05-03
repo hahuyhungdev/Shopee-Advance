@@ -1,20 +1,13 @@
-import { describe, expect, test } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import App from './App'
 import matchers from '@testing-library/jest-dom/matchers'
-import { BrowserRouter } from 'react-router-dom'
+import { screen, waitFor } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { logScreen, renderWithRouter } from './utils/testUtils'
 
 expect.extend(matchers)
 
 describe('App', () => {
   test('App render and change page', async () => {
-    const user = userEvent.setup()
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    )
+    const { user } = renderWithRouter()
     /**
      * waitFor sẽ run callback 1 vài lần
      * cho đến khi hết timeout hoặc expect pass
@@ -32,6 +25,14 @@ describe('App', () => {
       expect(document.title).toBe('Login | Shopee Clone')
       expect(screen.getByText('Do not have an account?')).toBeInTheDocument()
     })
-    screen.debug(document.body.parentElement as HTMLElement, 999999999)
+  })
+  test('direct to page not found', async () => {
+    const badPath = '/bad-path/dasd'
+    renderWithRouter({ route: badPath })
+    await waitFor(() => {
+      // explain: /i is regex flag, it means case insensitive
+      expect(screen.getByText(/Page Not Found/i)).toBeInTheDocument()
+    })
+    await logScreen()
   })
 })

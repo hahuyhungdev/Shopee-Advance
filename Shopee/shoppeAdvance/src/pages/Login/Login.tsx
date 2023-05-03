@@ -98,6 +98,7 @@ export default function Login() {
                 errorMessage={errors.password?.message}
               />
               <Button
+                type='submit'
                 isLoading={loginAccountMutation.isLoading}
                 disabled={loginAccountMutation.isLoading}
                 className='flex w-full justify-center bg-red-500 px-2 py-4 text-sm uppercase text-white hover:bg-red-600'
