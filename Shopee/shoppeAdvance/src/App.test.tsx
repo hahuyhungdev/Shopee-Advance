@@ -6,7 +6,7 @@ import { logScreen, renderWithRouter } from './utils/testUtils'
 expect.extend(matchers)
 
 describe('App', () => {
-  test('App render and change page', async () => {
+  it('App render and change page', async () => {
     const { user } = renderWithRouter()
     /**
      * waitFor sẽ run callback 1 vài lần
@@ -26,13 +26,12 @@ describe('App', () => {
       expect(screen.getByText('Do not have an account?')).toBeInTheDocument()
     })
   })
-  test('direct to page not found', async () => {
+  it('direct to page not found', async () => {
     const badPath = '/bad-path/dasd'
     renderWithRouter({ route: badPath })
     await waitFor(() => {
       // explain: /i is regex flag, it means case insensitive
       expect(screen.getByText(/Page Not Found/i)).toBeInTheDocument()
     })
-    await logScreen()
   })
 })
