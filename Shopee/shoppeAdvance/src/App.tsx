@@ -5,7 +5,6 @@ import useRouteElements from './useRouteElements'
 import { useContext, useEffect } from 'react'
 import { localStorageEventTarget } from './utils/auth'
 import { AppContext, AppProvider } from './contexts/app.context'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -19,24 +18,13 @@ function App() {
       localStorageEventTarget.removeEventListener('clearLS', reset)
     }
   }, [reset])
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false
-      }
-    }
-  })
+
   return (
     <div className='App'>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <AppProvider>
-            <ErrorBoundary>{routeElements}</ErrorBoundary>
-          </AppProvider>
-        </HelmetProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-
+      <HelmetProvider>
+        <ErrorBoundary>{routeElements}</ErrorBoundary>
+      </HelmetProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
       <ToastContainer position='top-right' autoClose={2000} />
     </div>
   )

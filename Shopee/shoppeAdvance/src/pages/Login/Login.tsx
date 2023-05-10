@@ -92,7 +92,7 @@ export default function Login() {
               <Input
                 className='my-2'
                 type='password'
-                placeholder='password'
+                placeholder='Password'
                 name='password'
                 register={register}
                 errorMessage={errors.password?.message}
