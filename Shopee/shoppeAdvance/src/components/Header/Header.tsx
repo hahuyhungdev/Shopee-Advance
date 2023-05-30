@@ -22,19 +22,7 @@ export default function Header() {
   const { register, onSubmitSearch } = useSearchProduct()
   const queryClient = useQueryClient()
 
-  const logoutMutation = useMutation({
-    mutationFn: () => {
-      return authApi.logoutAccount()
-    },
-    onSuccess: () => {
-      setIsAuthenticated(false)
-      setProfile(null)
-      toast.success('Logout success')
-      // case : when logout then remove all queries. if not, although logout but still have data in cache at the Cart
-      // The removeQueries method can be used to remove queries from the cache based on their query keys or any other functionally accessible property/state of the query.
-      queryClient.removeQueries(['purchases', { status: purchasesStatus.inCart }])
-    }
-  })
+  const logoutMutation = useMutation(authApi.logoutAccount)
 
   // when us direct then header just re-render
   // not unmount - mount again
@@ -50,7 +38,16 @@ export default function Header() {
 
   // handle logout mutate
   const handleLogout = () => {
-    logoutMutation.mutate()
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsAuthenticated(false)
+        setProfile(null)
+        toast.success('Logout success')
+        // case : when logout then remove all queries. if not, although logout but still have data in cache at the Cart
+        // The removeQueries method can be used to remove queries from the cache based on their query keys or any other functionally accessible property/state of the query.
+        queryClient.removeQueries(['purchases', { status: purchasesStatus.inCart }])
+      }
+    })
   }
   const changeLanguage = (lng: 'en' | 'vi') => {
     console.log('change')

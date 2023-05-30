@@ -29,11 +29,7 @@ export default function Login() {
   })
 
   // loginAccount Mutation
-  const loginAccountMutation = useMutation({
-    mutationFn: (body: FormData) => {
-      return authApi.loginAccount(body)
-    }
-  })
+  const loginAccountMutation = useMutation(authApi.loginAccount)
 
   // handle submit
   const onSubmit = handleSubmit(
