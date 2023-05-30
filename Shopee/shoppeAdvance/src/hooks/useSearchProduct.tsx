@@ -8,8 +8,8 @@ import { SchemaCommon, schemaCommon } from 'src/utils/rules'
 import useQueryConfig from './useQueryConfig'
 
 function useSearchProduct() {
-  type formData = Pick<SchemaCommon, 'name'>
-  const nameSchema = schemaCommon.pick(['name'])
+  type formData = SchemaCommon
+  const nameSchema = schemaCommon
   const navigate = useNavigate()
   const queryConfig = useQueryConfig()
   const { register, handleSubmit } = useForm({
