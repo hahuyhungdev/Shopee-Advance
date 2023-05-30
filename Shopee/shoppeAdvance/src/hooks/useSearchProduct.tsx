@@ -4,12 +4,12 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import path from 'src/constants/path'
-import { SchemaCommon, schemaCommon } from 'src/utils/rules'
+import { TSchemaSearch, schemaSearch } from 'src/utils/rules'
 import useQueryConfig from './useQueryConfig'
 
+type formData = TSchemaSearch
 function useSearchProduct() {
-  type formData = SchemaCommon
-  const nameSchema = schemaCommon
+  const nameSchema = schemaSearch
   const navigate = useNavigate()
   const queryConfig = useQueryConfig()
   const { register, handleSubmit } = useForm({
