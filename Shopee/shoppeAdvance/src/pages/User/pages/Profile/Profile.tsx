@@ -17,6 +17,7 @@ import InputFile from 'src/components/InputFile'
 import { UserSchema, userSchema } from 'src/utils/rules'
 import { getAvatarUrl, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import DateSelect from '../../components/DateSelect'
+import { useDropzone } from 'react-dropzone'
 
 function Info() {
   const {
@@ -68,14 +69,46 @@ const profileSchema = userSchema.pick(['name', 'address', 'phone', 'date_of_birt
 // Flow 2:
 // Nhấn upload: không upload lên server
 // Nhấn submit thì tiến hành upload lên server, nếu upload thành công thì tiến hành gọi api updateProfile
+type AvatarDropzoneProps = {
+  onChange: (acceptedFiles: File[]) => void
+}
 
+function AvatarDropzone({ onChange }: AvatarDropzoneProps) {
+  const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
+    accept: ['image/jpeg', 'image/png'] as any,
+    maxFiles: 5,
+    onDrop: onChange
+  })
+
+  const files = acceptedFiles.map((file) => (
+    <div key={file.name}>
+      <img src={URL.createObjectURL(file)} alt={file.name} />
+    </div>
+  ))
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      {files.length > 0 ? (
+        <div>{files}</div>
+      ) : (
+        <button
+          className='flex h-10 items-center justify-end rounded-sm border bg-white px-6 text-sm text-gray-600 shadow-sm'
+          type='button'
+        >
+          Chọn ảnh
+        </button>
+      )}
+    </div>
+  )
+}
 export default function Profile() {
   const { setProfile } = useContext(AppContext)
-  const [file, setFile] = useState<File>()
+  const [files, setFiles] = useState<File[]>([])
 
-  const previewImage = useMemo(() => {
-    return file ? URL.createObjectURL(file) : ''
-  }, [file])
+  const previewImages = useMemo(() => {
+    return files.map((file) => URL.createObjectURL(file))
+  }, [files])
 
   const { data: profileData, refetch } = useQuery({
     queryKey: ['profile'],
@@ -119,12 +152,13 @@ export default function Profile() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       let avatarName = avatar
-      if (file) {
+      if (files.length > 0) {
         const form = new FormData()
-        form.append('image', file)
-        const uploadRes = await uploadAvatarMutaion.mutateAsync(form)
-        avatarName = uploadRes.data.data
-        setValue('avatar', avatarName)
+        files.forEach((file) => {
+          form.append('multi-files', file)
+        })
+        const { data: uploadData } = await uploadAvatarMutaion.mutateAsync(form)
+        avatarName = uploadData.data[0]
       }
       const res = await updateProfileMutation.mutateAsync({
         ...data,
@@ -148,8 +182,8 @@ export default function Profile() {
     }
   })
 
-  const handleChangeFile = (file?: File | undefined) => {
-    setFile(file)
+  const handleChangeFile = (acceptedFiles: File[]) => {
+    setFiles(acceptedFiles)
   }
   return (
     <div className='rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-20'>
@@ -204,15 +238,29 @@ export default function Profile() {
           </div>
           <div className='flex justify-center md:w-72 md:border-l md:border-l-gray-200'>
             <div className='flex flex-col items-center'>
-              <div className='my-5 h-24 w-24'>
+              {/* <div className='my-5 h-24 w-24'>
                 <img
                   src={file ? previewImage : getAvatarUrl(avatar)}
                   alt='avatar'
                   className='h-full w-full rounded-full object-cover'
                 />
               </div>
-              <InputFile onChange={handleChangeFile} />
-
+              <InputFile onChange={handleChangeFile} /> */}
+              <div className='my-5 h-24 w-24'>
+                {previewImages.length > 0 ? (
+                  previewImages.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`preview-${index}`}
+                      className='h-full w-full rounded-full object-cover'
+                    />
+                  ))
+                ) : (
+                  <img src={getAvatarUrl(avatar)} alt='avatar' className='h-full w-full rounded-full object-cover' />
+                )}
+              </div>
+              <AvatarDropzone onChange={handleChangeFile} />
               <div className='mt-3 text-gray-400'>
                 <div>Dụng lượng file tối đa 1 MB</div>
                 <div>Định dạng:.JPEG, .PNG</div>

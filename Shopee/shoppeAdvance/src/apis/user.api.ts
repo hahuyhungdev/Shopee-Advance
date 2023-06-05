@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { User } from 'src/types/user.type'
 import { SuccessResponse } from 'src/types/utils.type'
 import http from 'src/utils/http'
@@ -15,7 +16,7 @@ const userApi = {
     return http.put<SuccessResponse<User>>('user', body)
   },
   uploadAvatar(body: FormData) {
-    return http.post<SuccessResponse<string>>('user/upload-avatar', body, {
+    return axios.post<SuccessResponse<string>>('http://localhost:3001/user/upload-avatar', body, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
