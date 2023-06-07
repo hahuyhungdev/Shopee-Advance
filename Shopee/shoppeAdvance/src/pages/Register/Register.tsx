@@ -5,15 +5,15 @@ import { Link, useNavigate } from 'react-router-dom'
 import authApi from 'src/apis/auth.api'
 import Input from 'src/components/Input'
 import omit from 'lodash/omit'
-import { Schema, schema } from 'src/utils/rules'
+import { IAuthSchema, AuthSchema } from 'src/utils/rules'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { SuccessResponse } from 'src/types/utils.type'
 import { useContext } from 'react'
 import { AppContext } from 'src/contexts/app.context'
 import Button from 'src/components/Button'
 
-type FormData = Pick<Schema, 'email' | 'password' | 'confirm_password'>
-export const registerSchema = schema.pick(['email', 'password', 'confirm_password'])
+type FormData = Pick<IAuthSchema, 'email' | 'password' | 'confirm_password' | 'term_of_use'>
+export const registerSchema = AuthSchema.pick(['email', 'password', 'confirm_password', 'term_of_use'])
 export default function Register() {
   const {
     handleSubmit,
@@ -28,7 +28,7 @@ export default function Register() {
 
   // registerMutations
   const registerAccountMutation = useMutation({
-    mutationFn: (body: Omit<Schema, 'confirm_password'>) => {
+    mutationFn: (body: Omit<IAuthSchema, 'confirm_password'>) => {
       return authApi.registerAccount(body)
     }
   })
@@ -45,7 +45,7 @@ export default function Register() {
         navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<SuccessResponse<Omit<Schema, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<SuccessResponse<Omit<IAuthSchema, 'confirm_password'>>>(error)) {
           const formError = error.response?.data?.data
           // case 1
           // if (formError?.email) {
@@ -61,7 +61,7 @@ export default function Register() {
             Object.keys(formError).forEach((key) => {
               setError(key as keyof Omit<FormData, 'confirm_password'>, {
                 type: 'Server',
-                message: formError[key as keyof Omit<FormData, 'confirm_password'>]
+                message: formError[key as keyof Omit<FormData, 'confirm_password' | 'term_of_use'>]
               })
             })
           }
@@ -104,6 +104,19 @@ export default function Register() {
                 autoComplete='on'
                 errorMessage={errors.confirm_password?.message}
               />
+              <div>
+                <Input
+                  classNameInput='inline-block mr-2'
+                  className='my-2'
+                  type='checkbox'
+                  placeholder='Đồng ý với điều khoản'
+                  name='term_of_use'
+                  register={register}
+                  autoComplete='on'
+                  errorMessage={errors.term_of_use?.message}
+                />
+              </div>
+
               <Button
                 isLoading={registerAccountMutation.isLoading}
                 disabled={registerAccountMutation.isLoading}

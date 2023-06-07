@@ -77,7 +77,7 @@ function testPriceMinMax(this: yup.TestContext<yup.AnyObject>) {
   }
   return price_min !== '' || price_max !== ''
 }
-export const schema = yup.object({
+export const AuthSchema = yup.object({
   email: yup
     .string()
     .required('Email does not exist')
@@ -108,13 +108,14 @@ export const schema = yup.object({
     name: 'price-not-allowed',
     message: 'Price max must be greater than price min',
     test: testPriceMinMax
-  })
+  }),
+  term_of_use: yup.boolean().oneOf([true], 'You must accept the terms and conditions')
 })
 export const schemaSearch = yup.object({
   name: yup.string().trim().required('Name does not exist')
 })
 // export type SchemaCommon = yup.InferType<typeof schemaCommon>
-export type Schema = yup.InferType<typeof schema>
+export type IAuthSchema = yup.InferType<typeof AuthSchema>
 // example if want to use yup with schema fields
 // export const loginSchema = schema.omit(['confirm_password'])
 // export type ILoginSchema = yup.InferType<typeof loginSchema>
@@ -132,8 +133,8 @@ export const userSchema = yup.object({
   address: yup.string().max(160, 'Độ dài tối đa là 160 ký tự'),
   avatar: yup.string().max(1000, 'Độ dài tối đa là 1000 ký tự'),
   date_of_birth: yup.date().max(new Date(), 'Hãy chọn một ngày trong quá khứ'),
-  password: schema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
-  new_password: schema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
+  password: AuthSchema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
+  new_password: AuthSchema.fields['password'] as yup.StringSchema<string | undefined, yup.AnyObject, undefined, ''>,
   confirm_password: handleConfirmPasswordYup('new_password')
 })
 

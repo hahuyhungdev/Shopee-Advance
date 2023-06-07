@@ -9,12 +9,12 @@ import Button from 'src/components/Button'
 import Input from 'src/components/Input'
 import { AppContext } from 'src/contexts/app.context'
 import { SuccessResponse } from 'src/types/utils.type'
-import { Schema, schema } from 'src/utils/rules'
+import { IAuthSchema, AuthSchema } from 'src/utils/rules'
 
 import { isAxiosError, isAxiosUnprocessableEntityError } from 'src/utils/utils'
 
-type FormData = Pick<Schema, 'email' | 'password'>
-export const loginSchema = schema.pick(['email', 'password'])
+type FormData = Pick<IAuthSchema, 'email' | 'password'>
+export const loginSchema = AuthSchema.pick(['email', 'password'])
 export default function Login() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()

@@ -9,7 +9,7 @@ import InputNumber from 'src/components/InputNumber'
 import path from 'src/constants/path'
 import { Category } from 'src/types/category.type'
 
-import { schema } from 'src/utils/rules'
+import { AuthSchema } from 'src/utils/rules'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { NoUndefinedField } from 'src/types/utils.type'
 import RatingStars from '../RatingStars/RatingStarts'
@@ -42,7 +42,7 @@ type FormData = NoUndefinedField<Pick<QueryConfig, 'price_min' | 'price_max'>>
  * 8. use path.home to get home path
  * 9. use queryConfig to get current query params
  */
-const priceSchema = schema.pick(['price_min', 'price_max'])
+const priceSchema = AuthSchema.pick(['price_min', 'price_max'])
 export default function AsideFilter({ categories, queryConfig }: Props) {
   const { t } = useTranslation('home')
   const { category } = queryConfig
@@ -153,7 +153,7 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
                     // because we use react-hook-form, we need to use ref
                     // however, we can't pass ref of InputNumber, so we must convert component to -- forwardRef -- should pass ref
                     ref={field.ref}
-                    classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
+
                     // take note: here, we can use {...field} to pass all properties of field to InputNumber ( you can click to see properties of field)
                   />
                 )
@@ -177,7 +177,6 @@ export default function AsideFilter({ categories, queryConfig }: Props) {
                     }}
                     value={field.value}
                     ref={field.ref}
-                    classNameInput='p-1 w-full rounded-sm border border-gray-300 outline-none focus:border-gray-500 focus:shadow-sm'
                   />
                 )
               }}
