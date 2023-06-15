@@ -12,7 +12,7 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
     classNameInput = 'w-full rounded-sm border border-gray-300 p-3 outline-none focus:border-gray-500 focus:shadow-sm',
     classNameError = 'mt-1 min-h-[1.25rem] text-sm text-red-600 text-center',
     onChange,
-    value,
+    value = '',
     ...rest
   },
   ref
