@@ -1,19 +1,18 @@
 import axios, { AxiosError, AxiosInstance, HttpStatusCode, InternalAxiosRequestConfig } from 'axios'
 import { toast } from 'react-toastify'
-import { AuthResponse, RefreshTokenRespone } from 'src/types/auth.type'
-import path from 'src/constants/path'
-import {
-  setAccessTokenToLS,
-  getAccessTokenFromLS,
-  clearLS,
-  setProfileToLS,
-  setRefreshTokenToLS,
-  getRefreshTokenFromLS
-} from './auth'
 import { URL_LOGIN, URL_LOGOUT, URL_REFRESH_TOKEN, URL_REGISTER } from 'src/apis/auth.api'
-import { isAxiosExpiredTokenError, isAxiosUnauthorizedError } from './utils'
+import { AuthResponse, RefreshTokenRespone } from 'src/types/auth.type'
 import { ErrorResponse } from 'src/types/utils.type'
-class Http {
+import {
+  clearLS,
+  getAccessTokenFromLS,
+  getRefreshTokenFromLS,
+  setAccessTokenToLS,
+  setProfileToLS,
+  setRefreshTokenToLS
+} from './auth'
+import { isAxiosExpiredTokenError, isAxiosUnauthorizedError } from './utils'
+export class Http {
   instance: AxiosInstance
   private accessToken: string
   private refreshToken: string
