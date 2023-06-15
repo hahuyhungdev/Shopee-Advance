@@ -1,18 +1,21 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
-import { AppProvider } from './contexts/app.context'
 
 import './index.css'
-import ErrorBoundary from './components/ErrorBoundary'
-import { HelmetProvider } from 'react-helmet-async'
+import { AppProvider } from './contexts/app.context'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
+      /* 
+      now retry 0. it is we doing offline, but case production, we should retry 3 times. 
+      we should set t
+      */
+      retry: 0
     }
   }
 })
@@ -20,14 +23,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <AppProvider>
-            <ErrorBoundary>
-              <App />
-            </ErrorBoundary>
-          </AppProvider>
-        </HelmetProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+        <AppProvider>
+          <App />
+        </AppProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>

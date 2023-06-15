@@ -18,6 +18,7 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
   ref
 ) {
   const [localValue, setLocalValue] = React.useState<string>(value as string)
+
   const handleChane = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     // console.log('value', value)
@@ -30,7 +31,13 @@ const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(function Inpu
   }
   return (
     <div className={className}>
-      <input className={classNameInput} value={value || localValue} {...rest} onChange={handleChane} ref={ref} />
+      <input
+        className={classNameInput}
+        value={value === undefined ? localValue : value}
+        {...rest}
+        onChange={handleChane}
+        ref={ref}
+      />
       <div className={classNameError}>{errorMessage}</div>
     </div>
   )

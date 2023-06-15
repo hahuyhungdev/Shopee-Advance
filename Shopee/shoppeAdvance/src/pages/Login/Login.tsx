@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import { HttpStatusCode } from 'axios'
 import React, { useContext } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import authApi from 'src/apis/auth.api'
@@ -71,6 +72,10 @@ export default function Login() {
 
   return (
     <div className='h-[600px] bg-orange'>
+      <Helmet>
+        <title>Login | Shopee Clone</title>
+        <meta name='description' content='Login | Shopee Clone' />
+      </Helmet>
       <div className='container bg-shopee bg-contain bg-center bg-no-repeat'>
         <div className='grid grid-cols-1 py-12 lg:h-[470px] lg:grid-cols-5 lg:pr-10'>
           <div className='md:col-span-2 md:col-start-4 md:mx-8'>
@@ -87,12 +92,13 @@ export default function Login() {
               <Input
                 className='my-2'
                 type='password'
-                placeholder='password'
+                placeholder='Password'
                 name='password'
                 register={register}
                 errorMessage={errors.password?.message}
               />
               <Button
+                type='submit'
                 isLoading={loginAccountMutation.isLoading}
                 disabled={loginAccountMutation.isLoading}
                 className='flex w-full justify-center bg-red-500 px-2 py-4 text-sm uppercase text-white hover:bg-red-600'
