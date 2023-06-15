@@ -39,7 +39,7 @@ export default function Input<TFieldValues extends FieldValues>({
   return (
     <div className={'relative ' + className}>
       <input className={classNameInput} {...registerResult} {...rest} type={handleType()} />
-      {rest.type === 'checkbox' && <span className='mb-2 text-gray-400'>Đồng ý với điều khoản điều khoản</span>}
+      {rest.type === 'checkbox' && <span className='mb-2 text-gray-400'>Đồng ý với điều khoản</span>}
       {rest.type === 'password' && openEye && (
         <svg
           xmlns='http://www.w3.org/2000/svg'
