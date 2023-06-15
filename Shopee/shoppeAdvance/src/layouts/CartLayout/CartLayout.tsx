@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import CartHeader from 'src/components/CartHeader'
 import Footer from 'src/components/Footer'
 import RegisterHeader from 'src/components/RegisterHeader'
@@ -8,10 +8,10 @@ interface Props {
 }
 export default function RegisterLayout({ children }: Props) {
   return (
-    <div>
+    <Suspense>
       <CartHeader />
       {children}
       <Footer />
-    </div>
+    </Suspense>
   )
 }

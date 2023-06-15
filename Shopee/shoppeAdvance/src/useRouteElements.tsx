@@ -1,10 +1,10 @@
-import path from 'src/constants/path'
-import { useContext, lazy, Suspense } from 'react'
+import { lazy, useContext } from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
+import path from 'src/constants/path'
 import { AppContext } from './contexts/app.context'
-import RegisterLayout from './layouts/RegisterLayout'
 import CartLayout from './layouts/CartLayout'
 import MainLayout from './layouts/MainLayout'
+import RegisterLayout from './layouts/RegisterLayout'
 import UserLayout from './pages/User/layouts/UserLayout'
 
 const Login = lazy(() => import('./pages/Login'))
@@ -74,27 +74,15 @@ export default function useRouteElements() {
           children: [
             {
               path: path.profile,
-              element: (
-                <Suspense>
-                  <Profile />
-                </Suspense>
-              )
+              element: <Profile />
             },
             {
               path: path.changePassword,
-              element: (
-                <Suspense>
-                  <ChangePassword />
-                </Suspense>
-              )
+              element: <ChangePassword />
             },
             {
               path: path.historyPurchase,
-              element: (
-                <Suspense>
-                  <HistoryPurchase />
-                </Suspense>
-              )
+              element: <HistoryPurchase />
             }
           ]
         }
@@ -104,9 +92,7 @@ export default function useRouteElements() {
       path: path.productDetail,
       element: (
         <MainLayout>
-          <Suspense>
-            <ProductDetail />
-          </Suspense>
+          <ProductDetail />
         </MainLayout>
       )
     },
@@ -115,9 +101,7 @@ export default function useRouteElements() {
       index: true,
       element: (
         <MainLayout>
-          <Suspense>
-            <ProductList />
-          </Suspense>
+          <ProductList />
         </MainLayout>
       )
     },
@@ -125,9 +109,7 @@ export default function useRouteElements() {
       path: '*',
       element: (
         <MainLayout>
-          <Suspense>
-            <NotFound />
-          </Suspense>
+          <NotFound />
         </MainLayout>
       )
     }
