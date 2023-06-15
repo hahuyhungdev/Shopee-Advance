@@ -38,9 +38,7 @@ export default function useRouteElements() {
           path: path.login,
           element: (
             <RegisterLayout>
-              <Suspense>
-                <Login />
-              </Suspense>
+              <Login />
             </RegisterLayout>
           )
         },
@@ -48,9 +46,7 @@ export default function useRouteElements() {
           path: path.register,
           element: (
             <RegisterLayout>
-              <Suspense>
-                <Register />
-              </Suspense>
+              <Register />
             </RegisterLayout>
           )
         }
@@ -64,9 +60,7 @@ export default function useRouteElements() {
           path: path.cart,
           element: (
             <CartLayout>
-              <Suspense>
-                <Cart />
-              </Suspense>
+              <Cart />
             </CartLayout>
           )
         },

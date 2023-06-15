@@ -14,6 +14,7 @@ import Product from '../ProductList/components/Product'
 import path from 'src/constants/path'
 import { Helmet } from 'react-helmet-async'
 import { convert } from 'html-to-text'
+import { Head } from 'src/components/head'
 
 export default function ProductDetail() {
   const queryClient = useQueryClient()
@@ -120,7 +121,7 @@ export default function ProductDetail() {
   if (!product) return null
   return (
     <div className='bg-gray-200 py-6'>
-      <Helmet>
+      {/* <Helmet>
         <title>{product.name} | Shopee Clone</title>
         <meta
           name='description'
@@ -130,7 +131,8 @@ export default function ProductDetail() {
             }
           })}
         />
-      </Helmet>
+      </Helmet> */}
+      <Head title={product.name} description={product.description} />
       <div className='container'>
         <div className='bg-white p-4 shadow'>
           <div className='grid grid-cols-12 gap-9'>
