@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Footer from 'src/components/Footer'
 import Header from 'src/components/Header'
 
@@ -7,10 +7,10 @@ interface Props {
 }
 export default function MainLayout({ children }: Props) {
   return (
-    <div>
+    <Suspense>
       <Header />
       {children}
       <Footer />
-    </div>
+    </Suspense>
   )
 }

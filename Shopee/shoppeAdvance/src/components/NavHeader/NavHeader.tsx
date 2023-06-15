@@ -13,9 +13,9 @@ import { useTranslation } from 'react-i18next'
 function NavHeader() {
   const { i18n } = useTranslation()
   const currentLanguage = locales[i18n.language as keyof typeof locales]
-  console.log('currentLanguage', currentLanguage)
+
   const { setIsAuthenticated, isAuthenticated, setProfile, profile } = useContext(AppContext)
-  console.log('isAuthenticated', isAuthenticated)
+
   const queryClient = useQueryClient()
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logoutAccount(),
@@ -34,7 +34,6 @@ function NavHeader() {
   }
 
   const changeLanguage = (lng: 'en' | 'vi') => {
-    console.log('change')
     i18n.changeLanguage(lng)
   }
   return (

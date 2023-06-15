@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import Footer from 'src/components/Footer'
 import RegisterHeader from 'src/components/RegisterHeader'
 
@@ -7,10 +7,10 @@ interface Props {
 }
 export default function RegisterLayout({ children }: Props) {
   return (
-    <div>
+    <Suspense>
       <RegisterHeader />
       {children}
       <Footer />
-    </div>
+    </Suspense>
   )
 }

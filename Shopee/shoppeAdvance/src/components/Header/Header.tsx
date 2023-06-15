@@ -22,8 +22,6 @@ export default function Header() {
   const { register, onSubmitSearch } = useSearchProduct()
   const queryClient = useQueryClient()
 
-  const logoutMutation = useMutation(authApi.logoutAccount)
-
   // when us direct then header just re-render
   // not unmount - mount again
   // except of course case logout then jump to RegisterLayout comback in case
@@ -36,6 +34,7 @@ export default function Header() {
   })
   const purchasesInCart = purchasesInCartData?.data?.data
 
+  const logoutMutation = useMutation(authApi.logoutAccount)
   // handle logout mutate
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
