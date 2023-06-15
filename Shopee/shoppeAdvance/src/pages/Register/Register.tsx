@@ -59,10 +59,14 @@ export default function Register() {
           // but in case have many error, we can use Object.keys to loop all error
           if (formError) {
             Object.keys(formError).forEach((key) => {
-              setError(key as keyof Omit<FormData, 'confirm_password'>, {
-                type: 'Server',
-                message: formError[key as keyof Omit<FormData, 'confirm_password' | 'term_of_use'>]
-              })
+              setError(
+                key as keyof Omit<FormData, 'confirm_password' | 'term_of_use'>,
+                {
+                  type: 'Server',
+                  message: formError[key as keyof Omit<FormData, 'confirm_password' | 'term_of_use'>]
+                },
+                { shouldFocus: true }
+              )
             })
           }
         } else {

@@ -104,9 +104,7 @@ export default function useRouteElements() {
       path: path.productDetail,
       element: (
         <MainLayout>
-          <Suspense>
-            <ProductDetail />
-          </Suspense>
+          <ProductDetail />
         </MainLayout>
       )
     },
@@ -115,9 +113,7 @@ export default function useRouteElements() {
       index: true,
       element: (
         <MainLayout>
-          <Suspense>
-            <ProductList />
-          </Suspense>
+          <ProductList />
         </MainLayout>
       )
     },
@@ -125,9 +121,7 @@ export default function useRouteElements() {
       path: '*',
       element: (
         <MainLayout>
-          <Suspense>
-            <NotFound />
-          </Suspense>
+          <NotFound />
         </MainLayout>
       )
     }
