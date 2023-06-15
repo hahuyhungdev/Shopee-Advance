@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix --ext ts,tsx src/",
     "prettier": "prettier --check \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
     "prettier:fix": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
-    "test": "vitest",
+    "test": "vitest --ci --reporters=default --reporters=jest-junit",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
@@ -67,6 +67,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "jest-junit": "^16.0.0",
     "msw": "^1.2.1",
     "postcss": "^8.4.21",
     "prettier": "^2.8.4",

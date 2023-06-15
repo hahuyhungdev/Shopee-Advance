@@ -1,4 +1,4 @@
-name: Pull Request Workflow
+name: Pull Request CI
 
 on:
   pull_request:
@@ -6,23 +6,33 @@ on:
       - develop
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install dependencies
+        run: yarn install
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14
-
+      - name: Install jq
+        run: sudo apt-get install jq
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Run tests
         run: yarn test
 
+      - name: Show detailed test results
+        run: |
+          cat jest-junit.xml
+          echo "====================================="
+          cat jest-junit.xml | jq '.testsuites.testsuite.testcase[].failure? | .[]'
+        if: always()
       - name: Build
         run: yarn build
